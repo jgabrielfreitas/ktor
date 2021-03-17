@@ -75,48 +75,6 @@ public actual interface ByteReadChannel {
     public actual suspend fun readRemaining(limit: Long, headerSizeHint: Int): ByteReadPacket
 
     /**
-     * Reads a long number (suspending if not enough bytes available) or fails if channel has been closed
-     * and not enough bytes.
-     */
-    public actual suspend fun readLong(): Long
-
-    /**
-     * Reads an int number (suspending if not enough bytes available) or fails if channel has been closed
-     * and not enough bytes.
-     */
-    public actual suspend fun readInt(): Int
-
-    /**
-     * Reads a short number (suspending if not enough bytes available) or fails if channel has been closed
-     * and not enough bytes.
-     */
-    public actual suspend fun readShort(): Short
-
-    /**
-     * Reads a byte (suspending if no bytes available yet) or fails if channel has been closed
-     * and not enough bytes.
-     */
-    public actual suspend fun readByte(): Byte
-
-    /**
-     * Reads a boolean value (suspending if no bytes available yet) or fails if channel has been closed
-     * and not enough bytes.
-     */
-    public actual suspend fun readBoolean(): Boolean
-
-    /**
-     * Reads double number (suspending if not enough bytes available) or fails if channel has been closed
-     * and not enough bytes.
-     */
-    public actual suspend fun readDouble(): Double
-
-    /**
-     * Reads float number (suspending if not enough bytes available) or fails if channel has been closed
-     * and not enough bytes.
-     */
-    public actual suspend fun readFloat(): Float
-
-    /**
      * Starts non-suspendable read session. After channel preparation [consumer] lambda will be invoked immediately
      * event if there are no bytes available for read yet.
      */

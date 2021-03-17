@@ -47,8 +47,8 @@ public abstract class ByteChannelSequentialBase(
             state.closed = value
         }
 
-    protected val writable: BytePacketBuilder = BytePacketBuilder(0, pool)
-    protected val readable: ByteReadPacket = ByteReadPacket(initial, pool)
+    internal val writable: BytePacketBuilder = BytePacketBuilder(0, pool)
+    internal val readable: ByteReadPacket = ByteReadPacket(initial, pool)
 
     private val slot = AwaitingSlot()
 
@@ -174,49 +174,13 @@ public abstract class ByteChannelSequentialBase(
         }
     }
 
-    override suspend fun writeByte(b: Byte) {
-        awaitAtLeastNBytesAvailableForWrite(1)
-        writable.writeByte(b)
-        afterWrite(1)
-    }
-
-    private inline fun <T : Any> reverseWrite(value: () -> T, reversed: () -> T): T {
+    internal inline fun <T : Any> reverseWrite(value: () -> T, reversed: () -> T): T {
         @Suppress("DEPRECATION_ERROR")
         return if (writeByteOrder == ByteOrder.BIG_ENDIAN) {
             value()
         } else {
             reversed()
         }
-    }
-
-    override suspend fun writeShort(s: Short) {
-        awaitAtLeastNBytesAvailableForWrite(2)
-        writable.writeShort(reverseWrite({ s }, { s.reverseByteOrder() }))
-        afterWrite(2)
-    }
-
-    override suspend fun writeInt(i: Int) {
-        awaitAtLeastNBytesAvailableForWrite(4)
-        writable.writeInt(reverseWrite({ i }, { i.reverseByteOrder() }))
-        afterWrite(4)
-    }
-
-    override suspend fun writeLong(l: Long) {
-        awaitAtLeastNBytesAvailableForWrite(8)
-        writable.writeLong(reverseWrite({ l }, { l.reverseByteOrder() }))
-        afterWrite(8)
-    }
-
-    override suspend fun writeFloat(f: Float) {
-        awaitAtLeastNBytesAvailableForWrite(4)
-        writable.writeFloat(reverseWrite({ f }, { f.reverseByteOrder() }))
-        afterWrite(4)
-    }
-
-    override suspend fun writeDouble(d: Double) {
-        awaitAtLeastNBytesAvailableForWrite(8)
-        writable.writeDouble(reverseWrite({ d }, { d.reverseByteOrder() }))
-        afterWrite(8)
     }
 
     override suspend fun writePacket(packet: ByteReadPacket) {
@@ -328,15 +292,7 @@ public abstract class ByteChannelSequentialBase(
         afterWrite(written)
     }
 
-    override suspend fun readByte(): Byte {
-        return if (readable.isNotEmpty) {
-            readable.readByte().also { afterRead(1) }
-        } else {
-            readByteSlow()
-        }
-    }
-
-    private fun checkClosed(n: Int) {
+    internal fun checkClosed(n: Int) {
         if (closed) {
             throw closedCause ?: prematureClose(n)
         }
@@ -346,117 +302,44 @@ public abstract class ByteChannelSequentialBase(
         return EOFException("$n bytes required but EOF reached")
     }
 
-    private suspend fun readByteSlow(): Byte {
-        do {
-            awaitSuspend(1)
-
-            if (readable.isNotEmpty) return readable.readByte().also { afterRead(1) }
-            checkClosed(1)
-        } while (true)
-    }
-
-    override suspend fun readShort(): Short {
-        return if (readable.hasBytes(2)) {
-            readable.readShort().reverseRead().also { afterRead(2) }
-        } else {
-            readShortSlow()
-        }
-    }
-
-    private suspend fun readShortSlow(): Short {
-        readNSlow(2) { return readable.readShort().reverseRead().also { afterRead(2) } }
-    }
-
     @Deprecated("Consider providing consumed count of bytes", level = DeprecationLevel.ERROR)
     protected fun afterRead() {
         afterRead(0)
     }
 
-    protected fun afterRead(count: Int) {
+    internal fun afterRead(count: Int) {
         _totalBytesRead += count
         slot.resume()
     }
 
     @Suppress("NOTHING_TO_INLINE", "DEPRECATION_ERROR")
-    private inline fun Short.reverseRead(): Short = when {
+    internal inline fun Short.reverseRead(): Short = when {
         readByteOrder == ByteOrder.BIG_ENDIAN -> this
         else -> this.reverseByteOrder()
     }
 
     @Suppress("NOTHING_TO_INLINE", "DEPRECATION_ERROR")
-    private inline fun Int.reverseRead(): Int = when {
+    internal inline fun Int.reverseRead(): Int = when {
         readByteOrder == ByteOrder.BIG_ENDIAN -> this
         else -> this.reverseByteOrder()
     }
 
     @Suppress("NOTHING_TO_INLINE", "DEPRECATION_ERROR")
-    private inline fun Long.reverseRead(): Long = when {
+    internal inline fun Long.reverseRead(): Long = when {
         readByteOrder == ByteOrder.BIG_ENDIAN -> this
         else -> this.reverseByteOrder()
     }
 
     @Suppress("NOTHING_TO_INLINE", "DEPRECATION_ERROR")
-    private inline fun Float.reverseRead(): Float = when {
+    internal inline fun Float.reverseRead(): Float = when {
         readByteOrder == ByteOrder.BIG_ENDIAN -> this
         else -> this.reverseByteOrder()
     }
 
     @Suppress("NOTHING_TO_INLINE", "DEPRECATION_ERROR")
-    private inline fun Double.reverseRead(): Double = when {
+    internal inline fun Double.reverseRead(): Double = when {
         readByteOrder == ByteOrder.BIG_ENDIAN -> this
         else -> this.reverseByteOrder()
-    }
-
-    override suspend fun readInt(): Int {
-        return if (readable.hasBytes(4)) {
-            readable.readInt().reverseRead().also { afterRead(4) }
-        } else {
-            readIntSlow()
-        }
-    }
-
-    private suspend fun readIntSlow(): Int {
-        readNSlow(4) {
-            return readable.readInt().reverseRead().also { afterRead(4) }
-        }
-    }
-
-    override suspend fun readLong(): Long {
-        return if (readable.hasBytes(8)) {
-            readable.readLong().reverseRead().also { afterRead(8) }
-        } else {
-            readLongSlow()
-        }
-    }
-
-    private suspend fun readLongSlow(): Long {
-        readNSlow(8) {
-            return readable.readLong().reverseRead().also { afterRead(8) }
-        }
-    }
-
-    override suspend fun readFloat(): Float = if (readable.hasBytes(4)) {
-        readable.readFloat().reverseRead().also { afterRead(4) }
-    } else {
-        readFloatSlow()
-    }
-
-    private suspend fun readFloatSlow(): Float {
-        readNSlow(4) {
-            return readable.readFloat().reverseRead().also { afterRead(4) }
-        }
-    }
-
-    override suspend fun readDouble(): Double = if (readable.hasBytes(8)) {
-        readable.readDouble().reverseRead().also { afterRead(8) }
-    } else {
-        readDoubleSlow()
-    }
-
-    private suspend fun readDoubleSlow(): Double {
-        readNSlow(8) {
-            return readable.readDouble().reverseRead().also { afterRead(8) }
-        }
     }
 
     override suspend fun readRemaining(limit: Long, headerSizeHint: Int): ByteReadPacket {
@@ -606,17 +489,6 @@ public abstract class ByteChannelSequentialBase(
         }
     }
 
-    override suspend fun readBoolean(): Boolean {
-        return if (readable.canRead()) (readable.readByte() == 1.toByte()).also { afterRead(1) }
-        else readBooleanSlow()
-    }
-
-    private suspend fun readBooleanSlow(): Boolean {
-        awaitSuspend(1)
-        checkClosed(1)
-        return readBoolean()
-    }
-
     private var lastReadAvailable: Int
         get() = state.lastReadAvailable
         set(value) {
@@ -662,7 +534,7 @@ public abstract class ByteChannelSequentialBase(
         awaitSuspend(1)
     }
 
-    protected suspend fun awaitSuspend(atLeast: Int): Boolean {
+    internal suspend fun awaitSuspend(atLeast: Int): Boolean {
         require(atLeast >= 0)
 
         awaitAtLeastNBytesAvailableForRead(atLeast)
@@ -823,7 +695,7 @@ public abstract class ByteChannelSequentialBase(
         }
     }
 
-    private suspend inline fun readNSlow(n: Int, block: () -> Nothing): Nothing {
+    internal suspend inline fun readNSlow(n: Int, block: () -> Nothing): Nothing {
         do {
             awaitSuspend(n)
 
@@ -848,7 +720,7 @@ public abstract class ByteChannelSequentialBase(
         afterWrite(0)
     }
 
-    protected fun afterWrite(count: Int) {
+    internal fun afterWrite(count: Int) {
         _totalBytesWritten += count
 
         if (closed) {

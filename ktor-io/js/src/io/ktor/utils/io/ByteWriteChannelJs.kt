@@ -78,42 +78,6 @@ public actual interface ByteWriteChannel {
      */
     public actual suspend fun writePacket(packet: ByteReadPacket)
 
-    /**
-     * Writes long number and suspends until written.
-     * Crashes if channel get closed while writing.
-     */
-    public actual suspend fun writeLong(l: Long)
-
-    /**
-     * Writes int number and suspends until written.
-     * Crashes if channel get closed while writing.
-     */
-    public actual suspend fun writeInt(i: Int)
-
-    /**
-     * Writes short number and suspends until written.
-     * Crashes if channel get closed while writing.
-     */
-    public actual suspend fun writeShort(s: Short)
-
-    /**
-     * Writes byte and suspends until written.
-     * Crashes if channel get closed while writing.
-     */
-    public actual suspend fun writeByte(b: Byte)
-
-    /**
-     * Writes double number and suspends until written.
-     * Crashes if channel get closed while writing.
-     */
-    public actual suspend fun writeDouble(d: Double)
-
-    /**
-     * Writes float number and suspends until written.
-     * Crashes if channel get closed while writing.
-     */
-    public actual suspend fun writeFloat(f: Float)
-
     @ExperimentalIoApi
     public actual suspend fun awaitFreeSpace()
 

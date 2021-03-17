@@ -820,35 +820,7 @@ internal open class ByteBufferChannel(
         }
     }
 
-    final override suspend fun readBoolean(): Boolean {
-        return readByte() != 0.toByte()
-    }
-
-    final override suspend fun readByte(): Byte {
-        return readPrimitive(1, ByteBuffer::get)
-    }
-
-    final override suspend fun readShort(): Short {
-        return readPrimitive(2, ByteBuffer::getShort)
-    }
-
-    final override suspend fun readInt(): Int {
-        return readPrimitive(4, ByteBuffer::getInt)
-    }
-
-    final override suspend fun readLong(): Long {
-        return readPrimitive(8, ByteBuffer::getLong)
-    }
-
-    final override suspend fun readFloat(): Float {
-        return intBitsToFloat(readPrimitive(4, ByteBuffer::getInt))
-    }
-
-    final override suspend fun readDouble(): Double {
-        return longBitsToDouble(readPrimitive(8, ByteBuffer::getLong))
-    }
-
-    private suspend inline fun <T : Number> readPrimitive(
+    internal suspend inline fun <T : Number> readPrimitive(
         size: Int,
         getter: ByteBuffer.() -> T
     ): T {
@@ -938,31 +910,7 @@ internal open class ByteBufferChannel(
         }
     }
 
-    override suspend fun writeByte(b: Byte) {
-        writePrimitive(1, { writeByte(b) }, { put(b) })
-    }
-
-    override suspend fun writeShort(s: Short) {
-        writePrimitive(2, { writeShort(s) }, { putShort(s) })
-    }
-
-    override suspend fun writeInt(i: Int) {
-        writePrimitive(4, { writeInt(i) }, { putInt(i) })
-    }
-
-    override suspend fun writeLong(l: Long) {
-        writePrimitive(8, { writeLong(l) }, { putLong(l) })
-    }
-
-    override suspend fun writeDouble(d: Double) {
-        writeLong(doubleToRawLongBits(d))
-    }
-
-    override suspend fun writeFloat(f: Float) {
-        writeInt(floatToRawIntBits(f))
-    }
-
-    private suspend inline fun writePrimitive(
+    internal suspend inline fun writePrimitive(
         size: Int,
         channelWriter: ByteBufferChannel.() -> Unit,
         bufferWriter: ByteBuffer.() -> Unit
