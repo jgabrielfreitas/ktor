@@ -36,7 +36,7 @@ class ConsumeEachBufferRangeTest {
             val data = ByteArrayOutputStream()
             val tmp = ByteArray(8192)
 
-            flow<ByteBuffer> {
+            flow {
                 channel.consumeEachBufferRange { buffer, _ ->
                     emit(buffer)
                     true

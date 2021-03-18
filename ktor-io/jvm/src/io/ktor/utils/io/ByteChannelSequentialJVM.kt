@@ -8,8 +8,9 @@ import java.nio.*
 
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @ExperimentalIoApi
-public class ByteChannelSequentialJVM(initial: ChunkBuffer, autoFlush: Boolean) :
-    ByteChannelSequentialBase(initial, autoFlush) {
+public class ByteChannelSequentialJVM(
+    initial: ChunkBuffer, autoFlush: Boolean
+) : ByteChannelSequentialBase(initial, autoFlush) {
 
     @Volatile
     private var attachedJob: Job? = null

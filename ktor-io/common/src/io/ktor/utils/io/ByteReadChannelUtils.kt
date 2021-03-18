@@ -6,13 +6,22 @@
 
 package io.ktor.utils.io
 
+import io.ktor.utils.io.bits.*
 import io.ktor.utils.io.core.*
 
 /**
  * Reads a long number (suspending if not enough bytes available) or fails if channel has been closed
  * and not enough bytes.
  */
-public expect suspend fun ByteReadChannel.readLong(): Long
+public suspend fun ByteReadChannel.readLong(): Long {
+    var result: Long
+    read(8) { memory, startIndex, endIndex ->
+        result = memory.loadLongAt(startIndex)
+        8
+    }
+
+    return result
+}
 
 /**
  * Reads an int number (suspending if not enough bytes available) or fails if channel has been closed

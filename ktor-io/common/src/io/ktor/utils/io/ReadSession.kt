@@ -3,6 +3,7 @@ package io.ktor.utils.io
 import io.ktor.utils.io.bits.Memory
 import io.ktor.utils.io.core.*
 import io.ktor.utils.io.core.internal.*
+import kotlin.contracts.*
 
 /**
  * Await until at least [desiredSize] is available for read or EOF and invoke [block] function. The block function
@@ -14,13 +15,16 @@ import io.ktor.utils.io.core.internal.*
  * the channel's capacity. The other case when a provided memory range could be less than [desiredSize] is that
  * all the requested bytes couldn't be represented as a single memory range due to internal implementation reasons.
  *
- * @return number of bytes consumed, possibly 0
+ * @return number of bytes consumed, possibly 0.
  */
-@ExperimentalIoApi
 public suspend inline fun ByteReadChannel.read(
     desiredSize: Int = 1,
-    block: (source: Memory, start: Long, endExclusive: Long) -> Int
+    crossinline block: suspend (source: Memory, start: Long, endExclusive: Long) -> Int
 ): Int {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+
     val buffer = requestBuffer(desiredSize) ?: Buffer.Empty
 
     try {
@@ -60,11 +64,9 @@ public interface ReadSession {
      * @return buffer for the requested range or `null` if it is impossible to provide such a buffer view
      * @throws Throwable if the channel has been closed with an exception or cancelled
      */
-    @Suppress("DEPRECATION")
     public fun request(atLeast: Int = 1): ChunkBuffer?
 }
 
-@Suppress("DEPRECATION")
 @Deprecated("Use read { } instead.")
 public interface SuspendableReadSession : ReadSession {
     /**
@@ -80,10 +82,9 @@ public interface SuspendableReadSession : ReadSession {
 
 @PublishedApi
 internal suspend fun ByteReadChannel.requestBuffer(desiredSize: Int): Buffer? {
-    @Suppress("DEPRECATION")
-    val readSession: SuspendableReadSession? = when {
-        this is SuspendableReadSession -> this
-        this is HasReadSession -> startReadSession()
+    val readSession: SuspendableReadSession? = when (this) {
+        is SuspendableReadSession -> this
+        is HasReadSession -> startReadSession()
         else -> null
     }
 
@@ -102,7 +103,6 @@ internal suspend fun ByteReadChannel.requestBuffer(desiredSize: Int): Buffer? {
 @PublishedApi
 internal suspend fun ByteReadChannel.completeReadingFromBuffer(buffer: Buffer?, bytesRead: Int) {
     check(bytesRead >= 0) { "bytesRead shouldn't be negative: $bytesRead" }
-    @Suppress("DEPRECATION")
     val readSession: SuspendableReadSession? = readSessionFor()
 
     if (readSession != null) {
@@ -119,7 +119,6 @@ internal suspend fun ByteReadChannel.completeReadingFromBuffer(buffer: Buffer?, 
     }
 }
 
-@Suppress("DEPRECATION")
 private suspend fun SuspendableReadSession.requestBufferSuspend(desiredSize: Int): Buffer? {
     await(desiredSize)
     return request(1)
@@ -127,21 +126,23 @@ private suspend fun SuspendableReadSession.requestBufferSuspend(desiredSize: Int
 
 private suspend fun ByteReadChannel.requestBufferFallback(desiredSize: Int): ChunkBuffer {
     val chunk = ChunkBuffer.Pool.borrow()
-    val copied =
-        peekTo(chunk.memory, chunk.writePosition.toLong(), 0L, desiredSize.toLong(), chunk.writeRemaining.toLong())
+    val copied = peekTo(
+        chunk.memory,
+        chunk.writePosition.toLong(), 0L, desiredSize.toLong(),
+        chunk.writeRemaining.toLong()
+    )
+
     chunk.commitWritten(copied.toInt())
 
     return chunk
 }
 
 internal interface HasReadSession {
-    @Suppress("DEPRECATION")
     public fun startReadSession(): SuspendableReadSession
 
     public fun endReadSession()
 }
 
-@Suppress("DEPRECATION", "NOTHING_TO_INLINE")
 private inline fun ByteReadChannel.readSessionFor(): SuspendableReadSession? = when {
     this is HasReadSession -> startReadSession()
     else -> null

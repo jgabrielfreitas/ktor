@@ -3,6 +3,7 @@ package io.ktor.utils.io
 import io.ktor.utils.io.bits.*
 import io.ktor.utils.io.core.*
 import io.ktor.utils.io.core.internal.*
+import kotlinx.coroutines.channels.*
 
 /**
  * Channel for asynchronous reading of sequences of bytes.
@@ -46,6 +47,7 @@ public expect interface ByteReadChannel {
      * @return number of bytes were read or `-1` if the channel has been closed
      */
     public suspend fun readAvailable(dst: ByteArray, offset: Int, length: Int): Int
+
     public suspend fun readAvailable(dst: ChunkBuffer): Int
 
     /**
@@ -53,7 +55,9 @@ public expect interface ByteReadChannel {
      * Suspends if not enough bytes available.
      */
     public suspend fun readFully(dst: ByteArray, offset: Int, length: Int)
+
     public suspend fun readFully(dst: ChunkBuffer, n: Int)
+
 
     /**
      * Reads the specified amount of bytes and makes a byte packet from them. Fails if channel has been closed

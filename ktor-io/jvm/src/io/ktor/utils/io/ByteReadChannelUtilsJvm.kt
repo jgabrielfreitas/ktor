@@ -11,15 +11,6 @@ import java.lang.Float.*
 import java.nio.*
 
 /**
- * Reads a long number (suspending if not enough bytes available) or fails if channel has been closed
- * and not enough bytes.
- */
-public actual suspend fun ByteReadChannel.readLong(): Long {
-    check(this is ByteBufferChannel)
-    return readPrimitive(8, ByteBuffer::getLong)
-}
-
-/**
  * Reads an int number (suspending if not enough bytes available) or fails if channel has been closed
  * and not enough bytes.
  */

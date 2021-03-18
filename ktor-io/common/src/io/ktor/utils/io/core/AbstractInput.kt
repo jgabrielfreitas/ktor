@@ -4,7 +4,6 @@ package io.ktor.utils.io.core
 
 import io.ktor.utils.io.bits.*
 import io.ktor.utils.io.core.internal.*
-import io.ktor.utils.io.core.internal.require
 import io.ktor.utils.io.pool.*
 
 /**
@@ -315,36 +314,6 @@ public abstract class AbstractInput(
         val byte = head.readByte()
         completeReadHead(head)
         return byte
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    final override fun readShort(): Short = readShort()
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    final override fun readFloat(): Float = readFloat()
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    final override fun readDouble(): Double = readDouble()
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    final override fun readInt(): Int {
-        return readInt()
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    final override fun readLong(): Long {
-        return readLong()
-    }
-
-    /**
-     * Read exactly [length] bytes to [dst] array at specified [offset]
-     */
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    final override fun readFully(dst: ByteArray, offset: Int, length: Int) {
-        val rc = readAvailable(dst, offset, length)
-        if (rc != length) {
-            throw EOFException("Not enough data in packet to fill buffer: ${length - rc} more bytes required")
-        }
     }
 
     /**

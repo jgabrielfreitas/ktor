@@ -59,7 +59,7 @@ public class ChunkBuffer internal constructor(
         }
     }
 
-    public open fun release(pool: ObjectPool<ChunkBuffer>) {
+    public fun release(pool: ObjectPool<ChunkBuffer>) {
         if (release()) {
             val origin = origin
             if (origin != null) {
@@ -117,7 +117,7 @@ public class ChunkBuffer internal constructor(
         } == 0
     }
 
-    final override fun reset() {
+    override fun reset() {
         require(origin == null) { "Unable to reset buffer with origin" }
 
         super.reset()

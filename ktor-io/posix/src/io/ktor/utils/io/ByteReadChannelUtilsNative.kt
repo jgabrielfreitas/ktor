@@ -9,20 +9,6 @@ package io.ktor.utils.io
 import io.ktor.utils.io.core.*
 
 /**
- * Reads a long number (suspending if not enough bytes available) or fails if channel has been closed
- * and not enough bytes.
- */
-public actual suspend fun ByteReadChannel.readLong(): Long {
-    check(this is ByteChannelSequentialBase)
-
-    return if (readable.hasBytes(8)) {
-        readable.readLong().reverseRead().also { afterRead(8) }
-    } else {
-        readLongSlow()
-    }
-}
-
-/**
  * Reads an int number (suspending if not enough bytes available) or fails if channel has been closed
  * and not enough bytes.
  */
