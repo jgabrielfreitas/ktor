@@ -15,26 +15,7 @@ public abstract class ByteReadPacketBase(
     head: ChunkBuffer,
     remaining: Long,
     pool: ObjectPool<ChunkBuffer>
-) : AbstractInput(head, remaining, pool) {
-
-    @Suppress("DEPRECATION")
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public constructor(
-        head: IoBuffer,
-        remaining: Long,
-        pool: ObjectPool<ChunkBuffer>
-    ) : this(head as ChunkBuffer, remaining, pool)
-
-    public companion object {
-        @Deprecated(
-            "Use ByteReadPacket.Empty instead",
-            ReplaceWith("ByteReadPacket.Empty"),
-            level = DeprecationLevel.ERROR
-        )
-        public val Empty: ByteReadPacket
-            get() = ByteReadPacket.Empty
-    }
-}
+) : AbstractInput(head, remaining, pool)
 
 public expect class EOFException(message: String) : IOException
 

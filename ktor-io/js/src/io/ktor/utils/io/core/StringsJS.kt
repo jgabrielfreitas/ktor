@@ -21,8 +21,7 @@ public actual fun String(bytes: ByteArray, offset: Int, length: Int, charset: Ch
     val bufferOffset = i8.byteOffset + offset
     val buffer = i8.buffer.slice(bufferOffset, bufferOffset + length)
 
-    @Suppress("DEPRECATION")
-    val view = IoBuffer(Memory.of(buffer), null)
+    val view = ChunkBuffer(Memory.of(buffer), null)
     view.resetForRead()
     val packet = ByteReadPacket(view, ChunkBuffer.NoPoolManuallyManaged)
 

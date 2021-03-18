@@ -604,7 +604,7 @@ internal open class ByteBufferChannel(
         return copied
     }
 
-    override suspend fun readFully(dst: IoBuffer, n: Int) {
+    override suspend fun readFully(dst: ChunkBuffer, n: Int) {
         val rc = readAsMuchAsPossible(dst, max = n)
         if (rc == n) {
             return
@@ -613,7 +613,7 @@ internal open class ByteBufferChannel(
         readFullySuspend(dst, n - rc)
     }
 
-    private suspend fun readFullySuspend(dst: IoBuffer, n: Int) {
+    private suspend fun readFullySuspend(dst: ChunkBuffer, n: Int) {
         var copied = 0
 
         while (dst.canWrite() && copied < n) {
@@ -715,7 +715,7 @@ internal open class ByteBufferChannel(
         }
     }
 
-    override suspend fun readAvailable(dst: IoBuffer): Int {
+    override suspend fun readAvailable(dst: ChunkBuffer): Int {
         val consumed = readAsMuchAsPossible(dst)
 
         return when {
@@ -747,7 +747,7 @@ internal open class ByteBufferChannel(
         return readAvailable(dst)
     }
 
-    private suspend fun readAvailableSuspend(dst: IoBuffer): Int {
+    private suspend fun readAvailableSuspend(dst: ChunkBuffer): Int {
         if (!readSuspend(1)) {
             return -1
         }
@@ -1013,7 +1013,7 @@ internal open class ByteBufferChannel(
         return writeAvailableSuspend(src)
     }
 
-    override suspend fun writeAvailable(src: IoBuffer): Int {
+    override suspend fun writeAvailable(src: ChunkBuffer): Int {
         joining?.let { resolveDelegation(this, it)?.let { return it.writeAvailable(src) } }
 
         val copied = writeAsMuchAsPossible(src)
@@ -1031,7 +1031,7 @@ internal open class ByteBufferChannel(
         return writeAvailable(src)
     }
 
-    private suspend fun writeAvailableSuspend(src: IoBuffer): Int {
+    private suspend fun writeAvailableSuspend(src: ChunkBuffer): Int {
         writeSuspend(1)
 
         joining?.let { resolveDelegation(this, it)?.let { return it.writeAvailableSuspend(src) } }
@@ -1061,7 +1061,7 @@ internal open class ByteBufferChannel(
         writeFully(slice.buffer)
     }
 
-    override suspend fun writeFully(src: IoBuffer) {
+    override suspend fun writeFully(src: ChunkBuffer) {
         writeAsMuchAsPossible(src)
 
         if (!src.canRead()) {
@@ -1081,7 +1081,7 @@ internal open class ByteBufferChannel(
         }
     }
 
-    private suspend fun writeFullySuspend(src: IoBuffer) {
+    private suspend fun writeFullySuspend(src: ChunkBuffer) {
         while (src.canRead()) {
             tryWriteSuspend(1)
 
@@ -2375,9 +2375,9 @@ internal open class ByteBufferChannel(
         var bytesCopied = 0
         val desiredSize = (min + offset).coerceAtMost(4088L).toInt()
 
-        read(desiredSize) { nioBuffer ->
-            if (nioBuffer.remaining() > offset) {
-                val view = nioBuffer.duplicate()!!
+        read(desiredSize) { nChunkBuffer ->
+            if (nChunkBuffer.remaining() > offset) {
+                val view = nChunkBuffer.duplicate()!!
                 view.position(view.position() + offset.toInt())
 
                 val oldLimit = view.limit()

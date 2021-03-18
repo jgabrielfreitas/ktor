@@ -108,7 +108,7 @@ internal fun byteCountUtf8(firstByte: Int): Int {
 
 @Suppress("DEPRECATION")
 @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
-public inline fun IoBuffer.decodeUTF8(consumer: (Char) -> Boolean): Int {
+public inline fun ChunkBuffer.decodeUTF8(consumer: (Char) -> Boolean): Int {
     return (this as Buffer).decodeUTF8(consumer)
 }
 

@@ -6,6 +6,7 @@ package io.ktor.tests.sessions
 
 import io.ktor.server.netty.*
 import io.ktor.sessions.*
+import io.ktor.utils.io.*
 import kotlinx.coroutines.*
 import java.util.concurrent.*
 import java.util.concurrent.atomic.*

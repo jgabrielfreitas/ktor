@@ -42,20 +42,10 @@ internal fun ByteReadPacket.unsafeAppend(builder: BytePacketBuilder): Int {
     return builderSize
 }
 
-@Suppress("DEPRECATION", "UNUSED")
-@JvmName("prepareReadFirstHead")
-@Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-public fun Input.prepareReadFirstHeadOld(minSize: Int): IoBuffer? {
-    return prepareReadFirstHead(minSize) as IoBuffer?
-}
-
 @DangerousInternalIoApi
 public fun Input.prepareReadFirstHead(minSize: Int): ChunkBuffer? {
     if (this is AbstractInput) {
         return prepareReadHead(minSize)
-    }
-    if (this is ChunkBuffer) {
-        return if (canRead()) this else null
     }
 
     return prepareReadHeadFallback(minSize)
@@ -81,17 +71,8 @@ private fun Input.prepareReadHeadFallback(minSize: Int): ChunkBuffer? {
     return buffer
 }
 
-@Suppress("UNUSED", "DEPRECATION")
-@Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-public fun Input.completeReadHead(current: IoBuffer) {
-    completeReadHead(current)
-}
-
 @DangerousInternalIoApi
 public fun Input.completeReadHead(current: ChunkBuffer) {
-    if (current === this) {
-        return
-    }
     if (this is AbstractInput) {
         if (!current.canRead()) {
             ensureNext(current)
@@ -112,18 +93,8 @@ private fun Input.completeReadHeadFallback(current: ChunkBuffer) {
     current.release(ChunkBuffer.Pool)
 }
 
-@Suppress("DEPRECATION", "UNUSED")
-@JvmName("prepareReadNextHead")
-@Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-public fun Input.prepareReadNextHeadOld(current: IoBuffer): IoBuffer? {
-    return prepareReadNextHead(current) as IoBuffer?
-}
-
 @DangerousInternalIoApi
 public fun Input.prepareReadNextHead(current: ChunkBuffer): ChunkBuffer? {
-    if (current === this) {
-        return if (canRead()) this else null
-    }
     if (this is AbstractInput) {
         return ensureNextHead(current)
     }
@@ -142,12 +113,6 @@ private fun Input.prepareNextReadHeadFallback(current: ChunkBuffer): ChunkBuffer
     }
 
     return current
-}
-
-@Suppress("DEPRECATION", "UNUSED")
-@Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-public fun Output.prepareWriteHead(capacity: Int, current: IoBuffer?): IoBuffer {
-    return prepareWriteHead(capacity, current) as IoBuffer
 }
 
 @DangerousInternalIoApi
@@ -170,12 +135,6 @@ private fun Output.prepareWriteHeadFallback(current: ChunkBuffer?): ChunkBuffer 
     }
 
     return ChunkBuffer.Pool.borrow()
-}
-
-@Suppress("DEPRECATION", "UNUSED")
-@Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-public fun Output.afterHeadWrite(current: IoBuffer) {
-    return afterHeadWrite(current)
 }
 
 @DangerousInternalIoApi

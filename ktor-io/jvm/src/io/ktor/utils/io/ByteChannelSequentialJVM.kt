@@ -1,13 +1,14 @@
 package io.ktor.utils.io
 
 import io.ktor.utils.io.core.*
+import io.ktor.utils.io.core.internal.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.*
 import java.nio.*
 
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @ExperimentalIoApi
-public class ByteChannelSequentialJVM(initial: IoBuffer, autoFlush: Boolean) :
+public class ByteChannelSequentialJVM(initial: ChunkBuffer, autoFlush: Boolean) :
     ByteChannelSequentialBase(initial, autoFlush) {
 
     @Volatile

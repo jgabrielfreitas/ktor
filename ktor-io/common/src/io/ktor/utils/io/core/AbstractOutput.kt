@@ -527,8 +527,8 @@ internal constructor(
 
     @Suppress("DEPRECATION")
     @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    internal open fun last(buffer: IoBuffer) {
-        appendSingleChunk(buffer as ChunkBuffer)
+    internal open fun last(buffer: ChunkBuffer) {
+        appendSingleChunk(buffer)
     }
 
     @Suppress("DEPRECATION")
@@ -537,7 +537,7 @@ internal constructor(
         replaceWith = ReplaceWith("appendNewChunk()"),
         level = DeprecationLevel.HIDDEN
     )
-    public fun appendNewBuffer(): IoBuffer = appendNewChunk() as IoBuffer
+    public fun appendNewBuffer(): ChunkBuffer = appendNewChunk() as ChunkBuffer
 
     @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
     public open fun reset() {

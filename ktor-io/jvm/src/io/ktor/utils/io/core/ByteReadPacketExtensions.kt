@@ -31,12 +31,12 @@ private class SingleByteBufferPool(
 ) : SingleInstancePool<ChunkBuffer>() {
     override fun produceInstance(): ChunkBuffer {
         @Suppress("DEPRECATION")
-        return IoBuffer(instance)
+        return ChunkBuffer(instance)
     }
 
     override fun disposeInstance(instance: ChunkBuffer) {
         @Suppress("DEPRECATION")
-        check(instance is IoBuffer) { "Only IoBuffer could be recycled" }
+        check(instance is ChunkBuffer) { "Only ChunkBuffer could be recycled" }
         release(this.instance)
     }
 }
