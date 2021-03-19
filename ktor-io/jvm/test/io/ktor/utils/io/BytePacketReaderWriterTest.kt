@@ -13,8 +13,12 @@ import kotlin.test.*
 import kotlin.test.Test
 
 class BytePacketReaderWriterTest {
-    @get:Rule
-    internal val pool = VerifyingObjectPool(ChunkBuffer.Pool)
+    internal val pool = VerifyingChunkBufferPool()
+
+    @After
+    fun assertEmpty() {
+        pool.assertEmpty()
+    }
 
     @Test
     fun testReaderEmpty() {

@@ -8,7 +8,7 @@ import io.ktor.utils.io.core.internal.*
 import kotlin.test.*
 
 class ReadTextCommonTest {
-    private val pool: VerifyingObjectPool<ChunkBuffer> = VerifyingObjectPool(ChunkBuffer.NoPool)
+    private val pool: VerifyingChunkBufferPool = VerifyingChunkBufferPool()
 
     @AfterTest
     fun verifyPool() {

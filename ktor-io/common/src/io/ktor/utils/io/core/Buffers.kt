@@ -80,13 +80,17 @@ public fun Buffer.readBytes(count: Int = readRemaining): ByteArray {
 
 @Suppress("DEPRECATION")
 internal fun IoBuffer.releaseImpl(pool: ObjectPool<IoBuffer>) {
-    if (release()) {
-        val origin = origin
-        if (origin is IoBuffer) {
+    if (!release()) return
+
+    val origin = origin
+    val poolToUse = (parentPool ?: pool) as ObjectPool<IoBuffer>
+
+    when (origin) {
+        is IoBuffer -> {
             unlink()
             origin.release(pool)
-        } else {
-            val poolToUse = (parentPool ?: pool) as ObjectPool<IoBuffer>
+        }
+        else -> {
             poolToUse.recycle(this)
         }
     }
