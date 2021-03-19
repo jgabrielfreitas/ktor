@@ -70,6 +70,8 @@ public class ApplicationEngineEnvironmentReloading(
         config.propertyOrNull("ktor.application.modules")?.getList() ?: emptyList()
     }
 
+    private val modulesNames: List<String> = configModulesNames + modules.map { it.methodName() }
+
     private val watcher by lazy { FileSystems.getDefault().newWatchService() }
 
     override val monitor: ApplicationEvents = ApplicationEvents()
@@ -295,12 +297,10 @@ public class ApplicationEngineEnvironmentReloading(
         safeRiseEvent(ApplicationStarting, newInstance)
 
         avoidingDoubleStartup {
-            configModulesNames.forEach { name ->
+            modulesNames.forEach { name ->
                 launchModuleByName(name, currentClassLoader, newInstance)
             }
         }
-
-        modules.forEach { it(newInstance) }
 
         safeRiseEvent(ApplicationStarted, newInstance)
         return newInstance
