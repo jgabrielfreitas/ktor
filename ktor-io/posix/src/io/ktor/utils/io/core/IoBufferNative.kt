@@ -29,7 +29,7 @@ public actual class IoBuffer internal actual constructor(
     public actual constructor(
         memory: Memory,
         origin: ChunkBuffer?,
-    ): this(memory, origin, null)
+    ) : this(memory, origin, null)
 
     public constructor(content: CPointer<ByteVar>, contentCapacity: Int) :
         this(Memory.of(content, contentCapacity), null)
@@ -342,7 +342,8 @@ public actual class IoBuffer internal actual constructor(
          * or [BytePacketBuilder])
          */
         @DangerousInternalIoApi
-        public actual val ReservedSize: Int get() = Buffer.ReservedSize
+        public actual val ReservedSize: Int
+            get() = Buffer.ReservedSize
 
         internal val EmptyBuffer = nativeHeap.allocArray<ByteVar>(0)
 

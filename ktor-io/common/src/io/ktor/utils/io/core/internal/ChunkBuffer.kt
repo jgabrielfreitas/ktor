@@ -9,7 +9,8 @@ import kotlinx.atomicfu.*
 
 @DangerousInternalIoApi
 public open class ChunkBuffer internal constructor(
-    memory: Memory, origin: ChunkBuffer?,
+    memory: Memory,
+    origin: ChunkBuffer?,
     internal val parentPool: ObjectPool<ChunkBuffer>?
 ) : Buffer(memory) {
     init {

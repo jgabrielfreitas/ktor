@@ -195,5 +195,4 @@ class ByteChannelTest {
         }
         assertEquals(channel.totalBytesRead, 0)
     }
-
 }

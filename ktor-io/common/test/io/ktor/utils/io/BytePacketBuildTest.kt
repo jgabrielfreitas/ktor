@@ -307,7 +307,6 @@ open class BytePacketBuildTest {
         return result
     }
 
-
     companion object {
         public const val PACKET_BUFFER_SIZE: Int = 4096
     }

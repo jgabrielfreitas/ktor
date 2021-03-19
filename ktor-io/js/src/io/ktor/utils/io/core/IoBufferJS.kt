@@ -10,7 +10,7 @@ import kotlin.contracts.*
 
 @Suppress("DIFFERENT_NAMES_FOR_THE_SAME_PARAMETER_IN_SUPERTYPES")
 @Deprecated("Use Buffer instead.", replaceWith = ReplaceWith("Buffer", "io.ktor.utils.io.core.Buffer"))
-public actual class IoBuffer actual internal constructor(
+public actual class IoBuffer internal actual constructor(
     memory: Memory,
     origin: ChunkBuffer?,
     parentPool: ObjectPool<IoBuffer>?
