@@ -77,31 +77,14 @@ public abstract class AbstractInput(
         }
 
     @PublishedApi
-    @Suppress("DEPRECATION_ERROR")
-    internal final var headRemaining: Int
+    internal final val headRemaining: Int
         inline get() = headEndExclusive - headPosition
-        @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-        set(newRemaining) {
-            updateHeadRemaining(newRemaining)
-        }
 
     private var tailRemaining: Long
         get() = state.tailRemaining
         set(newValue) {
             require(newValue >= 0) { "tailRemaining shouldn't be negative: $newValue" }
             state.tailRemaining = newValue
-        }
-
-    @Deprecated(
-        "Not supported anymore. All operations are big endian by default.",
-        level = DeprecationLevel.ERROR
-    )
-    final override var byteOrder: ByteOrder
-        get() = ByteOrder.BIG_ENDIAN
-        set(newOrder) {
-            if (newOrder != ByteOrder.BIG_ENDIAN) {
-                throw IllegalArgumentException("Only BIG_ENDIAN is supported.")
-            }
         }
 
     internal final fun prefetch(min: Long): Boolean {
@@ -188,18 +171,6 @@ public abstract class AbstractInput(
      * @return `true` if there are at least [n] bytes to read
      */
     public final fun hasBytes(n: Int): Boolean = headRemaining + tailRemaining >= n
-
-    /**
-     * `true` if no bytes available for read
-     */
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public final val isEmpty: Boolean
-        get() = endOfInput
-
-    @Suppress("DEPRECATION")
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public final val isNotEmpty: Boolean
-        get() = isNotEmpty
 
     private var noMoreChunksAvailable = false
 
@@ -332,18 +303,6 @@ public abstract class AbstractInput(
         if (discard(n) != n) throw EOFException("Unable to discard $n bytes due to end of packet")
     }
 
-    @PublishedApi
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    internal inline fun read(block: (Buffer) -> Unit) {
-        read(block = block)
-    }
-
-    @PublishedApi
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    internal inline fun read(n: Int, block: (Buffer) -> Unit) {
-        read(n, block)
-    }
-
     /**
      * Returns next byte (unsigned) or `-1` if no more bytes available
      */
@@ -358,17 +317,6 @@ public abstract class AbstractInput(
         return prepareReadLoop(1, head)?.tryPeekByte() ?: -1
     }
 
-    @Suppress("DEPRECATION")
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    final override fun peekTo(buffer: ChunkBuffer): Int {
-        val head = prepareReadHead(1) ?: return -1
-
-        val size = minOf(buffer.writeRemaining, head.readRemaining)
-        (buffer as Buffer).writeFully(head, size)
-
-        return size
-    }
-
     final override fun discard(n: Long): Long {
         if (n <= 0) return 0L
         return discardAsMuchAsPossible(n, 0)
@@ -380,25 +328,25 @@ public abstract class AbstractInput(
         val out = object : Appendable {
             private var idx = off
 
-            override fun append(c: Char): Appendable {
-                destination[idx++] = c
+            override fun append(value: Char): Appendable {
+                destination[idx++] = value
                 return this
             }
 
-            override fun append(csq: CharSequence?): Appendable {
-                if (csq is String) {
-                    csq.getCharsInternal(destination, idx)
-                    idx += csq.length
-                } else if (csq != null) {
-                    for (i in 0 until csq.length) {
-                        destination[idx++] = csq[i]
+            override fun append(value: CharSequence?): Appendable {
+                if (value is String) {
+                    value.getCharsInternal(destination, idx)
+                    idx += value.length
+                } else if (value != null) {
+                    for (i in 0 until value.length) {
+                        destination[idx++] = value[i]
                     }
                 }
 
                 return this
             }
 
-            override fun append(csq: CharSequence?, start: Int, end: Int): Appendable {
+            override fun append(value: CharSequence?, startIndex: Int, endIndex: Int): Appendable {
                 throw UnsupportedOperationException()
             }
         }

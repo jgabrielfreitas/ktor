@@ -6,7 +6,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.*
 import java.nio.*
 
-@Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @ExperimentalIoApi
 public class ByteChannelSequentialJVM(
     initial: ChunkBuffer, autoFlush: Boolean
@@ -96,7 +95,7 @@ public class ByteChannelSequentialJVM(
 
         prepareFlushedBytes()
 
-        var result = 0
+        var result: Int
         readable.readDirect(min) {
             val position = it.position()
             block(it)
@@ -152,27 +151,6 @@ public class ByteChannelSequentialJVM(
         }
     }
 
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    override suspend fun consumeEachBufferRange(visitor: ConsumeEachBufferVisitor) {
-        val readable = readable
-        var invokedWithLast = false
-
-        while (true) {
-            readable.readDirect(1) { bb: ByteBuffer ->
-                val last = closed && bb.remaining() == availableForRead
-                visitor(bb, last)
-                if (last) {
-                    invokedWithLast = true
-                }
-            }
-            if (!await(1)) break
-        }
-
-        if (!invokedWithLast) {
-            visitor(ByteBuffer.allocate(0), true)
-        }
-    }
-
     override fun <R> lookAhead(visitor: LookAheadSession.() -> R): R {
         TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
     }
@@ -204,7 +182,7 @@ public class ByteChannelSequentialJVM(
             return 0
         }
 
-        var result = 0
+        var result: Int
         writable.writeDirect(min) {
             val position = it.position()
             block(it)
@@ -230,7 +208,7 @@ public class ByteChannelSequentialJVM(
                 throw closedCause ?: ClosedSendChannelException("Channel closed for write")
             }
 
-            var shouldContinue: Boolean = false
+            var shouldContinue: Boolean
             awaitAtLeastNBytesAvailableForWrite(1)
             val result = writable.writeByteBufferDirect(1) {
                 shouldContinue = block(it)

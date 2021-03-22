@@ -1,13 +1,11 @@
 /*
  * Copyright 2014-2021 JetBrains s.r.o and contributors. Use of this source code is governed by the Apache 2.0 license.
  */
-
-@file:Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-
 package io.ktor.utils.io
 
 import io.ktor.utils.io.bits.*
 import io.ktor.utils.io.core.*
+import io.ktor.utils.io.readByte as readByte
 
 /**
  * Reads a long number (suspending if not enough bytes available) or fails if channel has been closed
@@ -15,8 +13,8 @@ import io.ktor.utils.io.core.*
  */
 public suspend fun ByteReadChannel.readLong(): Long {
     var result: Long
-    read(8) { memory, startIndex, endIndex ->
-        result = memory.loadLongAt(startIndex)
+    read(8) { memory, start, _ ->
+        result = memory.loadLongAt(start)
         8
     }
 
@@ -27,77 +25,75 @@ public suspend fun ByteReadChannel.readLong(): Long {
  * Reads an int number (suspending if not enough bytes available) or fails if channel has been closed
  * and not enough bytes.
  */
-public expect suspend fun ByteReadChannel.readInt(): Int
+public suspend fun ByteReadChannel.readInt(): Int {
+    var result: Int
+    read(4) { memory, start, _ ->
+        result = memory.loadIntAt(start)
+        4
+    }
+
+    return result
+}
 
 /**
  * Reads a short number (suspending if not enough bytes available) or fails if channel has been closed
  * and not enough bytes.
  */
-public expect suspend fun ByteReadChannel.readShort(): Short
+public suspend fun ByteReadChannel.readShort(): Short {
+    var result: Short
+    read(2) { memory, start, _ ->
+        result = memory.loadShortAt(start)
+        2
+    }
+
+    return result
+}
 
 /**
  * Reads a byte (suspending if no bytes available yet) or fails if channel has been closed
  * and not enough bytes.
  */
-public expect suspend fun ByteReadChannel.readByte(): Byte
+public suspend fun ByteReadChannel.readByte(): Byte {
+    var result: Byte
+    read(1) { memory, start, _ ->
+        result = memory.loadAt(start)
+        1
+    }
+
+    return result
+}
 
 /**
  * Reads a boolean value (suspending if no bytes available yet) or fails if channel has been closed
  * and not enough bytes.
  */
-public expect suspend fun ByteReadChannel.readBoolean(): Boolean
+public suspend fun ByteReadChannel.readBoolean(): Boolean = readByte() == 0.toByte()
 
 /**
  * Reads double number (suspending if not enough bytes available) or fails if channel has been closed
  * and not enough bytes.
  */
-public expect suspend fun ByteReadChannel.readDouble(): Double
+public suspend fun ByteReadChannel.readDouble(): Double {
+    var result: Double
+    read(8) { memory, start, _ ->
+        result = memory.loadDoubleAt(start)
+        8
+    }
+
+    return result
+}
 
 /**
  * Reads float number (suspending if not enough bytes available) or fails if channel has been closed
  * and not enough bytes.
  */
-public expect suspend fun ByteReadChannel.readFloat(): Float
-
-internal suspend fun ByteChannelSequentialBase.readLongSlow(): Long {
-    readNSlow(8) {
-        return readable.readLong().reverseRead().also { afterRead(8) }
+public suspend fun ByteReadChannel.readFloat(): Float {
+    var result: Float
+    read(8) { memory, start, end ->
+        result = memory.loadFloatAt(start)
+        8
     }
+
+    return result
 }
 
-internal suspend fun ByteChannelSequentialBase.readIntSlow(): Int {
-    readNSlow(4) {
-        return readable.readInt().reverseRead().also { afterRead(4) }
-    }
-}
-
-internal suspend fun ByteChannelSequentialBase.readShortSlow(): Short {
-    readNSlow(2) { return readable.readShort().reverseRead().also { afterRead(2) } }
-}
-
-internal suspend fun ByteChannelSequentialBase.readByteSlow(): Byte {
-    do {
-        awaitSuspend(1)
-
-        if (readable.isNotEmpty) return readable.readByte().also { afterRead(1) }
-        checkClosed(1)
-    } while (true)
-}
-
-internal suspend fun ByteChannelSequentialBase.readBooleanSlow(): Boolean {
-    awaitSuspend(1)
-    checkClosed(1)
-    return readBoolean()
-}
-
-internal suspend fun ByteChannelSequentialBase.readDoubleSlow(): Double {
-    readNSlow(8) {
-        return readable.readDouble().reverseRead().also { afterRead(8) }
-    }
-}
-
-internal suspend fun ByteChannelSequentialBase.readFloatSlow(): Float {
-    readNSlow(4) {
-        return readable.readFloat().reverseRead().also { afterRead(4) }
-    }
-}

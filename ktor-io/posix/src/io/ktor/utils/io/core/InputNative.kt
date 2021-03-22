@@ -5,15 +5,7 @@ import io.ktor.utils.io.bits.Memory
 import io.ktor.utils.io.core.internal.*
 import kotlinx.cinterop.*
 
-@Suppress("NO_ACTUAL_CLASS_MEMBER_FOR_EXPECTED_CLASS")
 public actual interface Input : Closeable {
-    @Deprecated(
-        "Not supported anymore. All operations are big endian by default. " +
-            "Use readXXXLittleEndian or readXXX then X.reverseByteOrder() instead.",
-        level = DeprecationLevel.ERROR
-    )
-    public actual var byteOrder: ByteOrder
-
     /**
      * It is `true` when it is known that no more bytes will be available. When it is `false` then this means that
      * it is not known yet or there are available bytes.
@@ -52,159 +44,10 @@ public actual interface Input : Closeable {
      */
     public actual fun readByte(): Byte
 
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    @Suppress("ACTUAL_WITHOUT_EXPECT")
-    public actual fun readShort(): Short {
-        return readShort()
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    @Suppress("ACTUAL_WITHOUT_EXPECT")
-    public actual fun readInt(): Int {
-        return readInt()
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    @Suppress("ACTUAL_WITHOUT_EXPECT")
-    public actual fun readLong(): Long {
-        return readLong()
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    @Suppress("ACTUAL_WITHOUT_EXPECT")
-    public actual fun readFloat(): Float {
-        return readFloat()
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    @Suppress("ACTUAL_WITHOUT_EXPECT")
-    public actual fun readDouble(): Double {
-        return readDouble()
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    @Suppress("ACTUAL_WITHOUT_EXPECT")
-    public actual fun readFully(dst: ByteArray, offset: Int, length: Int) {
-        return readFully(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    @Suppress("ACTUAL_WITHOUT_EXPECT")
-    public actual fun readFully(dst: ShortArray, offset: Int, length: Int) {
-        return readFully(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    @Suppress("ACTUAL_WITHOUT_EXPECT")
-    public actual fun readFully(dst: IntArray, offset: Int, length: Int) {
-        return readFully(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    @Suppress("ACTUAL_WITHOUT_EXPECT")
-    public actual fun readFully(dst: LongArray, offset: Int, length: Int) {
-        return readFully(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    @Suppress("ACTUAL_WITHOUT_EXPECT")
-    public actual fun readFully(dst: FloatArray, offset: Int, length: Int) {
-        return readFully(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    @Suppress("ACTUAL_WITHOUT_EXPECT")
-    public actual fun readFully(dst: DoubleArray, offset: Int, length: Int) {
-        return readFully(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    @Suppress("ACTUAL_WITHOUT_EXPECT", "DEPRECATION")
-    public actual fun readFully(dst: ChunkBuffer, length: Int) {
-        return readFully(dst, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    @Suppress("ACTUAL_WITHOUT_EXPECT")
-    public actual fun readAvailable(dst: ByteArray, offset: Int, length: Int): Int {
-        return readAvailable(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    @Suppress("ACTUAL_WITHOUT_EXPECT")
-    public actual fun readAvailable(dst: ShortArray, offset: Int, length: Int): Int {
-        return readAvailable(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    @Suppress("ACTUAL_WITHOUT_EXPECT")
-    public actual fun readAvailable(dst: IntArray, offset: Int, length: Int): Int {
-        return readAvailable(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    @Suppress("ACTUAL_WITHOUT_EXPECT")
-    public actual fun readAvailable(dst: LongArray, offset: Int, length: Int): Int {
-        return readAvailable(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    @Suppress("ACTUAL_WITHOUT_EXPECT")
-    public actual fun readAvailable(dst: FloatArray, offset: Int, length: Int): Int {
-        return readAvailable(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    @Suppress("ACTUAL_WITHOUT_EXPECT")
-    public actual fun readAvailable(dst: DoubleArray, offset: Int, length: Int): Int {
-        return readAvailable(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    @Suppress("ACTUAL_WITHOUT_EXPECT", "DEPRECATION")
-    public actual fun readAvailable(dst: ChunkBuffer, length: Int): Int {
-        return readAvailable(dst, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public fun readFully(dst: CPointer<ByteVar>, offset: Int, length: Int) {
-        return readFully(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public fun readFully(dst: CPointer<ByteVar>, offset: Long, length: Long) {
-        return readFully(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public fun readAvailable(dst: CPointer<ByteVar>, offset: Int, length: Int): Int {
-        return readAvailable(dst, offset, length)
-    }
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public fun readAvailable(dst: CPointer<ByteVar>, offset: Long, length: Long): Long {
-        return readAvailable(dst, offset, length)
-    }
-
     /*
      * Returns next byte (unsigned) or `-1` if no more bytes available
      */
     public actual fun tryPeek(): Int
-
-    /**
-     * Copy available bytes to the specified [buffer] but keep them available.
-     * If the underlying implementation could trigger
-     * bytes population from the underlying source and block until any bytes available
-     *
-     * Very similar to [readAvailable] but don't discard copied bytes.
-     *
-     * @return number of bytes were copied
-     */
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    @Suppress("DEPRECATION", "ACTUAL_WITHOUT_EXPECT")
-    public actual fun peekTo(buffer: ChunkBuffer): Int {
-        return peekTo(buffer)
-    }
 
     public actual fun discard(n: Long): Long
 

@@ -7,6 +7,7 @@ import io.ktor.utils.io.core.internal.*
 import io.ktor.utils.io.internal.*
 import io.ktor.utils.io.pool.*
 import kotlinx.atomicfu.locks.*
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.*
 
 @Deprecated("This is going to become internal. Use ByteReadChannel receiver instead.", level = DeprecationLevel.ERROR)
@@ -34,10 +35,6 @@ public abstract class ByteChannelSequentialBase(
     override val autoFlush: Boolean,
     pool: ObjectPool<ChunkBuffer> = ChunkBuffer.Pool
 ) : ByteChannel, ByteReadChannel, ByteWriteChannel, SuspendableReadSession, HasReadSession, HasWriteSession {
-
-    @Suppress("unused", "DEPRECATION")
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public constructor(initial: ChunkBuffer, autoFlush: Boolean) : this(initial, autoFlush, ChunkBuffer.Pool)
 
     private val state = ByteChannelSequentialBaseSharedState()
 
@@ -664,7 +661,7 @@ public abstract class ByteChannelSequentialBase(
             return false
         }
 
-        return close(cause ?: io.ktor.utils.io.CancellationException("Channel cancelled"))
+        return close(cause ?: CancellationException("Channel cancelled"))
     }
 
     override fun close(cause: Throwable?): Boolean {

@@ -1,5 +1,3 @@
-@file:Suppress("LocalVariableName", "RedundantModalityModifier")
-
 package io.ktor.utils.io.core
 
 import io.ktor.utils.io.bits.*
@@ -51,20 +49,6 @@ internal constructor(
     internal val head: ChunkBuffer
         get() = _head ?: ChunkBuffer.Empty
 
-    @PublishedApi
-    @Deprecated("Will be removed in future releases.", level = DeprecationLevel.HIDDEN)
-    internal val tail: ChunkBuffer
-        get() {
-            return prepareWriteHead(1)
-        }
-
-    @Deprecated("Will be removed. Override flush(buffer) properly.", level = DeprecationLevel.ERROR)
-    protected var currentTail: ChunkBuffer
-        get() = prepareWriteHead(1)
-        set(newValue) {
-            appendChain(newValue)
-        }
-
     internal var tailMemory: Memory
         get() = state.tailMemory
         set(value) {
@@ -107,27 +91,6 @@ internal constructor(
         get() = chainedSize + (tailPosition - tailInitialPosition)
         @Deprecated("There is no need to update/reset this value anymore.")
         set(_) {
-        }
-
-    /**
-     * Byte order (Endianness) to be used by future write functions calls on this builder instance. Doesn't affect any
-     * previously written values.
-     * @default [ByteOrder.BIG_ENDIAN]
-     */
-    @Deprecated(
-        "This is no longer supported. All operations are big endian by default. Use readXXXLittleEndian " +
-            "to read primitives in little endian",
-        level = DeprecationLevel.ERROR
-    )
-    final override var byteOrder: ByteOrder = ByteOrder.BIG_ENDIAN
-        set(value) {
-            field = value
-            if (value != ByteOrder.BIG_ENDIAN) {
-                throw IllegalArgumentException(
-                    "Only BIG_ENDIAN is supported. Use corresponding functions to read/write" +
-                        "in the little endian"
-                )
-            }
         }
 
     final override fun flush() {
@@ -249,15 +212,15 @@ internal constructor(
     /**
      * Append single UTF-8 character
      */
-    override fun append(c: Char): AbstractOutput {
+    override fun append(value: Char): AbstractOutput {
         val tailPosition = tailPosition
         if (tailEndExclusive - tailPosition >= 3) {
-            val size = tailMemory.putUtf8Char(tailPosition, c.toInt())
+            val size = tailMemory.putUtf8Char(tailPosition, value.toInt())
             this.tailPosition = tailPosition + size
             return this
         }
 
-        appendCharFallback(c)
+        appendCharFallback(value)
         return this
     }
 
@@ -269,21 +232,21 @@ internal constructor(
         }
     }
 
-    override fun append(csq: CharSequence?): AbstractOutput {
-        if (csq == null) {
+    override fun append(value: CharSequence?): AbstractOutput {
+        if (value == null) {
             append("null", 0, 4)
         } else {
-            append(csq, 0, csq.length)
+            append(value, 0, value.length)
         }
         return this
     }
 
-    override fun append(csq: CharSequence?, start: Int, end: Int): AbstractOutput {
-        if (csq == null) {
-            return append("null", start, end)
+    override fun append(value: CharSequence?, startIndex: Int, endIndex: Int): AbstractOutput {
+        if (value == null) {
+            return append("null", startIndex, endIndex)
         }
 
-        writeText(csq, start, end, Charsets.UTF_8)
+        writeText(value, startIndex, endIndex, Charsets.UTF_8)
 
         return this
     }
@@ -446,16 +409,6 @@ internal constructor(
         return idx
     }
 
-    @Deprecated("Use writeText instead", ReplaceWith("writeText(s)"))
-    public fun writeStringUtf8(s: String) {
-        writeText(s)
-    }
-
-    @Deprecated("Use writeText instead", ReplaceWith("this.writeText(cs)"))
-    public fun writeStringUtf8(cs: CharSequence) {
-        writeText(cs)
-    }
-
     @Suppress("NOTHING_TO_INLINE")
     private inline fun Buffer.putUtf8Char(v: Int) = when {
         v in 1..0x7f -> {
@@ -513,33 +466,5 @@ internal constructor(
         } finally {
             afterHeadWrite()
         }
-    }
-
-    @PublishedApi
-    @Deprecated("There is no need to do that anymore.", level = DeprecationLevel.HIDDEN)
-    internal fun addSize(n: Int) {
-        check(n >= 0) { "It should be non-negative size increment: $n" }
-        check(n <= tailRemaining) { "Unable to mark more bytes than available: $n > $tailRemaining" }
-
-        // For binary compatibility we need to update pointers
-        tailPosition += n
-    }
-
-    @Suppress("DEPRECATION")
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    internal open fun last(buffer: ChunkBuffer) {
-        appendSingleChunk(buffer)
-    }
-
-    @Suppress("DEPRECATION")
-    @Deprecated(
-        "Use appendNewChunk instead",
-        replaceWith = ReplaceWith("appendNewChunk()"),
-        level = DeprecationLevel.HIDDEN
-    )
-    public fun appendNewBuffer(): ChunkBuffer = appendNewChunk() as ChunkBuffer
-
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public open fun reset() {
     }
 }

@@ -89,14 +89,6 @@ public actual interface ByteReadChannel {
     public actual suspend fun readRemaining(limit: Long, headerSizeHint: Int): ByteReadPacket
 
     /**
-     * For every available bytes range invokes [visitor] function until it return false or end of stream encountered
-     */
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public suspend fun consumeEachBufferRange(visitor: ConsumeEachBufferVisitor) {
-        consumeEachBufferRange(visitor)
-    }
-
-    /**
      * Starts non-suspendable read session. After channel preparation [consumer] lambda will be invoked immediately
      * event if there are no bytes available for read yet.
      */

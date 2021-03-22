@@ -1,5 +1,3 @@
-@file:Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-
 package io.ktor.utils.io.core
 
 import io.ktor.utils.io.bits.*

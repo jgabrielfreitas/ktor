@@ -1,9 +1,6 @@
 /*
  * Copyright 2014-2021 JetBrains s.r.o and contributors. Use of this source code is governed by the Apache 2.0 license.
  */
-
-@file:Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-
 package io.ktor.utils.io
 
 import java.lang.Double.*
@@ -15,7 +12,7 @@ import java.lang.Float.*
  */
 public actual suspend fun ByteWriteChannel.writeLong(l: Long) {
     check(this is ByteBufferChannel)
-    writePrimitive(8, { writeLong(l) }, { putLong(l) })
+    write(8) { it.putLong(l) }
 }
 
 /**
@@ -23,8 +20,7 @@ public actual suspend fun ByteWriteChannel.writeLong(l: Long) {
  * Crashes if channel get closed while writing.
  */
 public actual suspend fun ByteWriteChannel.writeInt(i: Int) {
-    check(this is ByteBufferChannel)
-    writePrimitive(4, { writeInt(i) }, { putInt(i) })
+    write(4) { it.putInt(i) }
 }
 
 /**
@@ -32,8 +28,7 @@ public actual suspend fun ByteWriteChannel.writeInt(i: Int) {
  * Crashes if channel get closed while writing.
  */
 public actual suspend fun ByteWriteChannel.writeShort(s: Short) {
-    check(this is ByteBufferChannel)
-    writePrimitive(2, { writeShort(s) }, { putShort(s) })
+    write(2) { it.putShort(s) }
 }
 
 /**
@@ -41,8 +36,7 @@ public actual suspend fun ByteWriteChannel.writeShort(s: Short) {
  * Crashes if channel get closed while writing.
  */
 public actual suspend fun ByteWriteChannel.writeByte(b: Byte) {
-    check(this is ByteBufferChannel)
-    writePrimitive(1, { writeByte(b) }, { put(b) })
+    write(1) { it.put(b) }
 }
 
 /**

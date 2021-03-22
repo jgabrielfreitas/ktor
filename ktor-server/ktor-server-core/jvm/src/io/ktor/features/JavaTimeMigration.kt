@@ -7,7 +7,6 @@ package io.ktor.features
 import io.ktor.sessions.*
 import java.time.*
 
-@Suppress("unused", "EXTENSION_SHADOWED_BY_MEMBER")
 @Deprecated("Use maxAgeInSeconds or maxAgeDuration instead.")
 public var CORS.Configuration.maxAge: Duration
     get() = Duration.ofSeconds(maxAgeInSeconds)

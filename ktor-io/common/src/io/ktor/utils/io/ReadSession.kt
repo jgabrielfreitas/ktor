@@ -19,7 +19,7 @@ import kotlin.contracts.*
  */
 public suspend inline fun ByteReadChannel.read(
     desiredSize: Int = 1,
-    crossinline block: suspend (source: Memory, start: Long, endExclusive: Long) -> Int
+    crossinline block: suspend (source: Memory, start: Int, endExclusive: Int) -> Int
 ): Int {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
@@ -28,7 +28,7 @@ public suspend inline fun ByteReadChannel.read(
     val buffer = requestBuffer(desiredSize) ?: Buffer.Empty
 
     try {
-        val bytesRead = block(buffer.memory, buffer.readPosition.toLong(), buffer.writePosition.toLong())
+        val bytesRead = block(buffer.memory, buffer.readPosition, buffer.writePosition)
         completeReadingFromBuffer(buffer, bytesRead)
         return bytesRead
     } catch (cause: Throwable) {

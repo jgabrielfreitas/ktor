@@ -1,13 +1,7 @@
 package io.ktor.utils.io.core
 
 import io.ktor.utils.io.bits.*
-import io.ktor.utils.io.core.internal.*
-import io.ktor.utils.io.core.internal.require
-import io.ktor.utils.io.internal.jvm.*
-import io.ktor.utils.io.pool.*
-import io.ktor.utils.io.utils.*
 import java.nio.*
-import java.nio.charset.*
 import kotlin.contracts.*
 
 public fun Buffer.readFully(dst: ByteBuffer, length: Int) {

@@ -7,157 +7,57 @@ import io.ktor.utils.io.core.internal.*
  * This shouldn't be implemented directly. Inherit [AbstractOutput] instead.
  */
 public expect interface Output : Appendable, Closeable {
-    @Deprecated(
-        "This is no longer supported. All operations are big endian by default. Use writeXXXLittleEndian " +
-            "to write primitives in little endian order" +
-            " or do X.reverseByteOrder() and then writeXXX instead.",
-        level = DeprecationLevel.ERROR
-    )
-    public var byteOrder: ByteOrder
-
     public fun writeByte(v: Byte)
 
     public fun flush()
 
     override fun close()
 
-    @Suppress("EXPECTED_DECLARATION_WITH_BODY")
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public fun writeShort(v: Short) {
-        writeShort(v)
-    }
-
-    @Suppress("EXPECTED_DECLARATION_WITH_BODY")
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public fun writeInt(v: Int) {
-        writeInt(v)
-    }
-
-    @Suppress("EXPECTED_DECLARATION_WITH_BODY")
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public fun writeLong(v: Long) {
-        writeLong(v)
-    }
-
-    @Suppress("EXPECTED_DECLARATION_WITH_BODY")
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public fun writeFloat(v: Float) {
-        writeFloat(v)
-    }
-
-    @Suppress("EXPECTED_DECLARATION_WITH_BODY")
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public fun writeDouble(v: Double) {
-        writeDouble(v)
-    }
-
-    @Suppress("EXPECTED_DECLARATION_WITH_BODY")
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public fun writeFully(src: ByteArray, offset: Int, length: Int) {
-        writeFully(src, offset, length)
-    }
-
-    @Suppress("EXPECTED_DECLARATION_WITH_BODY")
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public fun writeFully(src: ShortArray, offset: Int, length: Int) {
-        writeFully(src, offset, length)
-    }
-
-    @Suppress("EXPECTED_DECLARATION_WITH_BODY")
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public fun writeFully(src: IntArray, offset: Int, length: Int) {
-        writeFully(src, offset, length)
-    }
-
-    @Suppress("EXPECTED_DECLARATION_WITH_BODY")
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public fun writeFully(src: LongArray, offset: Int, length: Int) {
-        writeFully(src, offset, length)
-    }
-
-    @Suppress("EXPECTED_DECLARATION_WITH_BODY")
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public fun writeFully(src: FloatArray, offset: Int, length: Int) {
-        writeFully(src, offset, length)
-    }
-
-    @Suppress("EXPECTED_DECLARATION_WITH_BODY")
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public fun writeFully(src: DoubleArray, offset: Int, length: Int) {
-        writeFully(src, offset, length)
-    }
-
-    @Suppress("EXPECTED_DECLARATION_WITH_BODY", "DEPRECATION")
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public fun writeFully(src: ChunkBuffer, length: Int) {
-        writeFully(src, length)
-    }
-
     public fun append(csq: CharArray, start: Int, end: Int): Appendable
-
-    @Suppress("EXPECTED_DECLARATION_WITH_BODY", "DEPRECATION")
-    @Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-    public fun fill(n: Long, v: Byte) {
-        fill(n, v)
-    }
 }
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 public fun Output.append(csq: CharSequence, start: Int = 0, end: Int = csq.length): Appendable {
     return append(csq, start, end)
 }
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 public fun Output.append(csq: CharArray, start: Int = 0, end: Int = csq.size): Appendable {
     return append(csq, start, end)
 }
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 public fun Output.writeFully(src: ByteArray, offset: Int = 0, length: Int = src.size - offset) {
     writeFullyBytesTemplate(offset, length) { buffer, currentOffset, count ->
         buffer.writeFully(src, currentOffset, count)
     }
 }
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 public fun Output.writeFully(src: ShortArray, offset: Int = 0, length: Int = src.size - offset) {
     writeFullyTemplate(2, offset, length) { buffer, currentOffset, count ->
         buffer.writeFully(src, currentOffset, count)
     }
 }
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 public fun Output.writeFully(src: IntArray, offset: Int = 0, length: Int = src.size - offset) {
     writeFullyTemplate(4, offset, length) { buffer, currentOffset, count ->
         buffer.writeFully(src, currentOffset, count)
     }
 }
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 public fun Output.writeFully(src: LongArray, offset: Int = 0, length: Int = src.size - offset) {
     writeFullyTemplate(8, offset, length) { buffer, currentOffset, count ->
         buffer.writeFully(src, currentOffset, count)
     }
 }
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 public fun Output.writeFully(src: FloatArray, offset: Int = 0, length: Int = src.size - offset) {
     writeFullyTemplate(4, offset, length) { buffer, currentOffset, count ->
         buffer.writeFully(src, currentOffset, count)
     }
 }
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 public fun Output.writeFully(src: DoubleArray, offset: Int = 0, length: Int = src.size - offset) {
     writeFullyTemplate(8, offset, length) { buffer, currentOffset, count ->
         buffer.writeFully(src, currentOffset, count)
     }
-}
-
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER", "DEPRECATION")
-@Deprecated("Binary compatibility.", level = DeprecationLevel.HIDDEN)
-public fun Output.writeFully(src: ChunkBuffer, length: Int = src.readRemaining) {
-    writeFully(src as Buffer, length)
 }
 
 public fun Output.writeFully(src: Buffer, length: Int = src.readRemaining) {
@@ -176,7 +76,6 @@ public fun Output.writeFully(src: Memory, offset: Long, length: Long) {
     }
 }
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 public fun Output.fill(times: Long, value: Byte = 0) {
     if (this is AbstractOutput) {
         var written = 0L
@@ -238,8 +137,7 @@ public inline fun Output.writeWhileSize(initialSize: Int = 1, block: (Buffer) ->
 }
 
 public fun Output.writePacket(packet: ByteReadPacket) {
-    @Suppress("DEPRECATION_ERROR")
-    if (this is BytePacketBuilderBase) {
+    if (this is AbstractOutput) {
         writePacket(packet)
         return
     }
