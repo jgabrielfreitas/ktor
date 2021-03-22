@@ -233,7 +233,7 @@ class RoutingProcessingTest {
                 uri = "/z/a/b/c"
                 method = HttpMethod.Get
             }
-            it("should have handled by more specific rout") {
+            it("should have handled by more specific route") {
                 assertEquals("[Z] a/b/c", path)
             }
         }
@@ -242,7 +242,7 @@ class RoutingProcessingTest {
                 uri = "/x/a/b/c"
                 method = HttpMethod.Get
             }
-            it("should have handled by more specific rout") {
+            it("should have handled by more specific route") {
                 assertEquals("x/a/b/c", path)
             }
         }
@@ -673,12 +673,16 @@ class RoutingProcessingTest {
             assertEquals("/bar", it.response.content)
             assertEquals(
                 """Trace for [bar]
-/, segment:0 -> SUCCESS @ /bar/(method:GET))
-  /bar, segment:1 -> SUCCESS @ /bar/(method:GET))
-    /bar/(method:GET), segment:1 -> SUCCESS @ /bar/(method:GET))
-  /baz, segment:0 -> FAILURE "Selector didn't match" @ /baz)
-  /{param}, segment:0 -> FAILURE "Better match was already found" @ /{param})
-  /*, segment:0 -> FAILURE "Better match was already found" @ /*)
+/, segment:0 -> SUCCESS @ /
+  /bar, segment:1 -> SUCCESS @ /bar
+    /bar/(method:GET), segment:1 -> SUCCESS @ /bar/(method:GET)
+  /baz, segment:0 -> FAILURE "Selector didn't match" @ /baz
+  /{param}, segment:0 -> FAILURE "Better match was already found" @ /{param}
+  /*, segment:0 -> FAILURE "Better match was already found" @ /*
+Matched routes:
+  ""; q=1.0 -> "bar"; q=1.0 -> "(method:GET)"; q=0.8
+Route resolve result:
+  SUCCESS @ /bar/(method:GET)
 """.toPlatformLineSeparators(),
                 trace?.buildText()
             )
@@ -691,16 +695,22 @@ class RoutingProcessingTest {
             assertEquals("/{param}/x", it.response.content)
             assertEquals(
                 """Trace for [bar, x]
-/, segment:0 -> SUCCESS; Parameters [param=[bar]] @ /{param}/x/(method:GET))
-  /bar, segment:1 -> FAILURE "Not all segments matched" @ /bar/(method:GET))
-    /bar/(method:GET), segment:1 -> FAILURE "Not all segments matched" @ /bar/(method:GET))
-  /baz, segment:0 -> FAILURE "Selector didn't match" @ /baz)
-  /{param}, segment:1 -> SUCCESS @ /{param}/x/(method:GET))
-    /{param}/(method:GET), segment:1 -> FAILURE "Not all segments matched" @ /{param}/(method:GET))
-    /{param}/x, segment:2 -> SUCCESS @ /{param}/x/(method:GET))
-      /{param}/x/(method:GET), segment:2 -> SUCCESS @ /{param}/x/(method:GET))
-      /{param}/x/z, segment:2 -> FAILURE "Selector didn't match" @ /{param}/x/z)
-  /*, segment:0 -> FAILURE "Better match was already found" @ /*)
+/, segment:0 -> SUCCESS @ /
+  /bar, segment:1 -> SUCCESS @ /bar
+    /bar/(method:GET), segment:1 -> SUCCESS @ /bar/(method:GET)
+      /bar/(method:GET), segment:1 -> FAILURE "Not all segments matched" @ /bar/(method:GET)
+  /baz, segment:0 -> FAILURE "Selector didn't match" @ /baz
+  /{param}, segment:1 -> SUCCESS; Parameters [param=[bar]] @ /{param}
+    /{param}/(method:GET), segment:1 -> SUCCESS @ /{param}/(method:GET)
+      /{param}/(method:GET), segment:1 -> FAILURE "Not all segments matched" @ /{param}/(method:GET)
+    /{param}/x, segment:2 -> SUCCESS @ /{param}/x
+      /{param}/x/(method:GET), segment:2 -> SUCCESS @ /{param}/x/(method:GET)
+      /{param}/x/z, segment:2 -> FAILURE "Selector didn't match" @ /{param}/x/z
+  /*, segment:0 -> FAILURE "Better match was already found" @ /*
+Matched routes:
+  ""; q=1.0 -> "{param}"; q=0.8 -> "x"; q=1.0 -> "(method:GET)"; q=0.8
+Route resolve result:
+  SUCCESS; Parameters [param=[bar]] @ /{param}/x/(method:GET)
 """.toPlatformLineSeparators(),
                 trace?.buildText()
             )
@@ -713,16 +723,21 @@ class RoutingProcessingTest {
             assertEquals("/baz/x", it.response.content)
             assertEquals(
                 """Trace for [baz, x]
-/, segment:0 -> SUCCESS @ /baz/x/(method:GET))
-  /bar, segment:0 -> FAILURE "Selector didn't match" @ /bar)
-  /baz, segment:1 -> SUCCESS @ /baz/x/(method:GET))
-    /baz/(method:GET), segment:1 -> FAILURE "Not all segments matched" @ /baz/(method:GET))
-    /baz/x, segment:2 -> SUCCESS @ /baz/x/(method:GET))
-      /baz/x/(method:GET), segment:2 -> SUCCESS @ /baz/x/(method:GET))
-      /baz/x/{optional?}, segment:2 -> FAILURE "Better match was already found" @ /baz/x/{optional?})
-    /baz/{y}, segment:1 -> FAILURE "Better match was already found" @ /baz/{y})
-  /{param}, segment:0 -> FAILURE "Better match was already found" @ /{param})
-  /*, segment:0 -> FAILURE "Better match was already found" @ /*)
+/, segment:0 -> SUCCESS @ /
+  /bar, segment:0 -> FAILURE "Selector didn't match" @ /bar
+  /baz, segment:1 -> SUCCESS @ /baz
+    /baz/(method:GET), segment:1 -> SUCCESS @ /baz/(method:GET)
+      /baz/(method:GET), segment:1 -> FAILURE "Not all segments matched" @ /baz/(method:GET)
+    /baz/x, segment:2 -> SUCCESS @ /baz/x
+      /baz/x/(method:GET), segment:2 -> SUCCESS @ /baz/x/(method:GET)
+      /baz/x/{optional?}, segment:2 -> FAILURE "Better match was already found" @ /baz/x/{optional?}
+    /baz/{y}, segment:1 -> FAILURE "Better match was already found" @ /baz/{y}
+  /{param}, segment:0 -> FAILURE "Better match was already found" @ /{param}
+  /*, segment:0 -> FAILURE "Better match was already found" @ /*
+Matched routes:
+  ""; q=1.0 -> "baz"; q=1.0 -> "x"; q=1.0 -> "(method:GET)"; q=0.8
+Route resolve result:
+  SUCCESS @ /baz/x/(method:GET)
 """.toPlatformLineSeparators(),
                 trace?.buildText()
             )
@@ -735,16 +750,21 @@ class RoutingProcessingTest {
             assertEquals("/baz/{y}", it.response.content)
             assertEquals(
                 """Trace for [baz, doo]
-/, segment:0 -> SUCCESS; Parameters [y=[doo]] @ /baz/{y}/(method:GET))
-  /bar, segment:0 -> FAILURE "Selector didn't match" @ /bar)
-  /baz, segment:1 -> SUCCESS; Parameters [y=[doo]] @ /baz/{y}/(method:GET))
-    /baz/(method:GET), segment:1 -> FAILURE "Not all segments matched" @ /baz/(method:GET))
-    /baz/x, segment:1 -> FAILURE "Selector didn't match" @ /baz/x)
-    /baz/{y}, segment:2 -> SUCCESS @ /baz/{y}/(method:GET))
-      /baz/{y}/(method:GET), segment:2 -> SUCCESS @ /baz/{y}/(method:GET))
-      /baz/{y}/value, segment:2 -> FAILURE "Selector didn't match" @ /baz/{y}/value)
-  /{param}, segment:0 -> FAILURE "Better match was already found" @ /{param})
-  /*, segment:0 -> FAILURE "Better match was already found" @ /*)
+/, segment:0 -> SUCCESS @ /
+  /bar, segment:0 -> FAILURE "Selector didn't match" @ /bar
+  /baz, segment:1 -> SUCCESS @ /baz
+    /baz/(method:GET), segment:1 -> SUCCESS @ /baz/(method:GET)
+      /baz/(method:GET), segment:1 -> FAILURE "Not all segments matched" @ /baz/(method:GET)
+    /baz/x, segment:1 -> FAILURE "Selector didn't match" @ /baz/x
+    /baz/{y}, segment:2 -> SUCCESS; Parameters [y=[doo]] @ /baz/{y}
+      /baz/{y}/(method:GET), segment:2 -> SUCCESS @ /baz/{y}/(method:GET)
+      /baz/{y}/value, segment:2 -> FAILURE "Selector didn't match" @ /baz/{y}/value
+  /{param}, segment:0 -> FAILURE "Better match was already found" @ /{param}
+  /*, segment:0 -> FAILURE "Better match was already found" @ /*
+Matched routes:
+  ""; q=1.0 -> "baz"; q=1.0 -> "{y}"; q=0.8 -> "(method:GET)"; q=0.8
+Route resolve result:
+  SUCCESS; Parameters [y=[doo]] @ /baz/{y}/(method:GET)
 """.toPlatformLineSeparators(),
                 trace?.buildText()
             )
@@ -757,17 +777,23 @@ class RoutingProcessingTest {
             assertEquals("/baz/x/{optional?}", it.response.content)
             assertEquals(
                 """Trace for [baz, x, z]
-/, segment:0 -> SUCCESS; Parameters [optional=[z]] @ /baz/x/{optional?}/(method:GET))
-  /bar, segment:0 -> FAILURE "Selector didn't match" @ /bar)
-  /baz, segment:1 -> SUCCESS; Parameters [optional=[z]] @ /baz/x/{optional?}/(method:GET))
-    /baz/(method:GET), segment:1 -> FAILURE "Not all segments matched" @ /baz/(method:GET))
-    /baz/x, segment:2 -> SUCCESS; Parameters [optional=[z]] @ /baz/x/{optional?}/(method:GET))
-      /baz/x/(method:GET), segment:2 -> FAILURE "Not all segments matched" @ /baz/x/(method:GET))
-      /baz/x/{optional?}, segment:3 -> SUCCESS @ /baz/x/{optional?}/(method:GET))
-        /baz/x/{optional?}/(method:GET), segment:3 -> SUCCESS @ /baz/x/{optional?}/(method:GET))
-    /baz/{y}, segment:1 -> FAILURE "Better match was already found" @ /baz/{y})
-  /{param}, segment:0 -> FAILURE "Better match was already found" @ /{param})
-  /*, segment:0 -> FAILURE "Better match was already found" @ /*)
+/, segment:0 -> SUCCESS @ /
+  /bar, segment:0 -> FAILURE "Selector didn't match" @ /bar
+  /baz, segment:1 -> SUCCESS @ /baz
+    /baz/(method:GET), segment:1 -> SUCCESS @ /baz/(method:GET)
+      /baz/(method:GET), segment:1 -> FAILURE "Not all segments matched" @ /baz/(method:GET)
+    /baz/x, segment:2 -> SUCCESS @ /baz/x
+      /baz/x/(method:GET), segment:2 -> SUCCESS @ /baz/x/(method:GET)
+        /baz/x/(method:GET), segment:2 -> FAILURE "Not all segments matched" @ /baz/x/(method:GET)
+      /baz/x/{optional?}, segment:3 -> SUCCESS; Parameters [optional=[z]] @ /baz/x/{optional?}
+        /baz/x/{optional?}/(method:GET), segment:3 -> SUCCESS @ /baz/x/{optional?}/(method:GET)
+    /baz/{y}, segment:1 -> FAILURE "Better match was already found" @ /baz/{y}
+  /{param}, segment:0 -> FAILURE "Better match was already found" @ /{param}
+  /*, segment:0 -> FAILURE "Better match was already found" @ /*
+Matched routes:
+  ""; q=1.0 -> "baz"; q=1.0 -> "x"; q=1.0 -> "{optional?}"; q=0.8 -> "(method:GET)"; q=0.8
+Route resolve result:
+  SUCCESS; Parameters [optional=[z]] @ /baz/x/{optional?}/(method:GET)
 """.toPlatformLineSeparators(),
                 trace?.buildText()
             )
@@ -780,17 +806,23 @@ class RoutingProcessingTest {
             assertEquals("/baz/x/{optional?}", it.response.content)
             assertEquals(
                 """Trace for [baz, x, value]
-/, segment:0 -> SUCCESS; Parameters [optional=[value]] @ /baz/x/{optional?}/(method:GET))
-  /bar, segment:0 -> FAILURE "Selector didn't match" @ /bar)
-  /baz, segment:1 -> SUCCESS; Parameters [optional=[value]] @ /baz/x/{optional?}/(method:GET))
-    /baz/(method:GET), segment:1 -> FAILURE "Not all segments matched" @ /baz/(method:GET))
-    /baz/x, segment:2 -> SUCCESS; Parameters [optional=[value]] @ /baz/x/{optional?}/(method:GET))
-      /baz/x/(method:GET), segment:2 -> FAILURE "Not all segments matched" @ /baz/x/(method:GET))
-      /baz/x/{optional?}, segment:3 -> SUCCESS @ /baz/x/{optional?}/(method:GET))
-        /baz/x/{optional?}/(method:GET), segment:3 -> SUCCESS @ /baz/x/{optional?}/(method:GET))
-    /baz/{y}, segment:1 -> FAILURE "Better match was already found" @ /baz/{y})
-  /{param}, segment:0 -> FAILURE "Better match was already found" @ /{param})
-  /*, segment:0 -> FAILURE "Better match was already found" @ /*)
+/, segment:0 -> SUCCESS @ /
+  /bar, segment:0 -> FAILURE "Selector didn't match" @ /bar
+  /baz, segment:1 -> SUCCESS @ /baz
+    /baz/(method:GET), segment:1 -> SUCCESS @ /baz/(method:GET)
+      /baz/(method:GET), segment:1 -> FAILURE "Not all segments matched" @ /baz/(method:GET)
+    /baz/x, segment:2 -> SUCCESS @ /baz/x
+      /baz/x/(method:GET), segment:2 -> SUCCESS @ /baz/x/(method:GET)
+        /baz/x/(method:GET), segment:2 -> FAILURE "Not all segments matched" @ /baz/x/(method:GET)
+      /baz/x/{optional?}, segment:3 -> SUCCESS; Parameters [optional=[value]] @ /baz/x/{optional?}
+        /baz/x/{optional?}/(method:GET), segment:3 -> SUCCESS @ /baz/x/{optional?}/(method:GET)
+    /baz/{y}, segment:1 -> FAILURE "Better match was already found" @ /baz/{y}
+  /{param}, segment:0 -> FAILURE "Better match was already found" @ /{param}
+  /*, segment:0 -> FAILURE "Better match was already found" @ /*
+Matched routes:
+  ""; q=1.0 -> "baz"; q=1.0 -> "x"; q=1.0 -> "{optional?}"; q=0.8 -> "(method:GET)"; q=0.8
+Route resolve result:
+  SUCCESS; Parameters [optional=[value]] @ /baz/x/{optional?}/(method:GET)
 """.toPlatformLineSeparators(),
                 trace?.buildText()
             )
@@ -803,13 +835,17 @@ class RoutingProcessingTest {
             assertEquals("/{param}", it.response.content)
             assertEquals(
                 """Trace for [p]
-/, segment:0 -> SUCCESS; Parameters [param=[p]] @ /{param}/(method:GET))
-  /bar, segment:0 -> FAILURE "Selector didn't match" @ /bar)
-  /baz, segment:0 -> FAILURE "Selector didn't match" @ /baz)
-  /{param}, segment:1 -> SUCCESS @ /{param}/(method:GET))
-    /{param}/(method:GET), segment:1 -> SUCCESS @ /{param}/(method:GET))
-    /{param}/x, segment:1 -> FAILURE "Selector didn't match" @ /{param}/x)
-  /*, segment:0 -> FAILURE "Better match was already found" @ /*)
+/, segment:0 -> SUCCESS @ /
+  /bar, segment:0 -> FAILURE "Selector didn't match" @ /bar
+  /baz, segment:0 -> FAILURE "Selector didn't match" @ /baz
+  /{param}, segment:1 -> SUCCESS; Parameters [param=[p]] @ /{param}
+    /{param}/(method:GET), segment:1 -> SUCCESS @ /{param}/(method:GET)
+    /{param}/x, segment:1 -> FAILURE "Selector didn't match" @ /{param}/x
+  /*, segment:0 -> FAILURE "Better match was already found" @ /*
+Matched routes:
+  ""; q=1.0 -> "{param}"; q=0.8 -> "(method:GET)"; q=0.8
+Route resolve result:
+  SUCCESS; Parameters [param=[p]] @ /{param}/(method:GET)
 """.toPlatformLineSeparators(),
                 trace?.buildText()
             )
@@ -822,15 +858,20 @@ class RoutingProcessingTest {
             assertEquals("/{param}/x", it.response.content)
             assertEquals(
                 """Trace for [p, x]
-/, segment:0 -> SUCCESS; Parameters [param=[p]] @ /{param}/x/(method:GET))
-  /bar, segment:0 -> FAILURE "Selector didn't match" @ /bar)
-  /baz, segment:0 -> FAILURE "Selector didn't match" @ /baz)
-  /{param}, segment:1 -> SUCCESS @ /{param}/x/(method:GET))
-    /{param}/(method:GET), segment:1 -> FAILURE "Not all segments matched" @ /{param}/(method:GET))
-    /{param}/x, segment:2 -> SUCCESS @ /{param}/x/(method:GET))
-      /{param}/x/(method:GET), segment:2 -> SUCCESS @ /{param}/x/(method:GET))
-      /{param}/x/z, segment:2 -> FAILURE "Selector didn't match" @ /{param}/x/z)
-  /*, segment:0 -> FAILURE "Better match was already found" @ /*)
+/, segment:0 -> SUCCESS @ /
+  /bar, segment:0 -> FAILURE "Selector didn't match" @ /bar
+  /baz, segment:0 -> FAILURE "Selector didn't match" @ /baz
+  /{param}, segment:1 -> SUCCESS; Parameters [param=[p]] @ /{param}
+    /{param}/(method:GET), segment:1 -> SUCCESS @ /{param}/(method:GET)
+      /{param}/(method:GET), segment:1 -> FAILURE "Not all segments matched" @ /{param}/(method:GET)
+    /{param}/x, segment:2 -> SUCCESS @ /{param}/x
+      /{param}/x/(method:GET), segment:2 -> SUCCESS @ /{param}/x/(method:GET)
+      /{param}/x/z, segment:2 -> FAILURE "Selector didn't match" @ /{param}/x/z
+  /*, segment:0 -> FAILURE "Better match was already found" @ /*
+Matched routes:
+  ""; q=1.0 -> "{param}"; q=0.8 -> "x"; q=1.0 -> "(method:GET)"; q=0.8
+Route resolve result:
+  SUCCESS; Parameters [param=[p]] @ /{param}/x/(method:GET)
 """.toPlatformLineSeparators(),
                 trace?.buildText()
             )
@@ -838,7 +879,7 @@ class RoutingProcessingTest {
     }
 
     @Test
-    fun testRouteWithParamaterPrefixAndSuffixHasMorePriority() = withTestApplication {
+    fun testRouteWithParameterPrefixAndSuffixHasMorePriority() = withTestApplication {
         application.routing {
             get("/foo:{baz}") {
                 call.respondText("foo")

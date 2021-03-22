@@ -93,6 +93,13 @@ public data class RouteSelectorEvaluation(
             RouteSelectorEvaluation(true, RouteSelectorEvaluation.qualityConstant)
 
         /**
+         * Route evaluation succeeded for a transparent value
+         */
+        @PublicAPICandidate("1.6.0")
+        internal val Transparent: RouteSelectorEvaluation =
+            RouteSelectorEvaluation(true, RouteSelectorEvaluation.qualityTransparent)
+
+        /**
          * Route evaluation succeeded for a single path segment with a constant value
          */
         public val ConstantPath: RouteSelectorEvaluation =
@@ -257,15 +264,15 @@ public data class PathSegmentConstantRouteSelector(
 internal object TrailingSlashRouteSelector : RouteSelector(RouteSelectorEvaluation.qualityConstant) {
 
     override fun evaluate(context: RoutingResolveContext, segmentIndex: Int): RouteSelectorEvaluation = when {
-        context.segments.isEmpty() -> RouteSelectorEvaluation.Constant
-        segmentIndex < context.segments.lastIndex -> RouteSelectorEvaluation.Constant
+        context.segments.isEmpty() -> RouteSelectorEvaluation.Transparent
+        segmentIndex < context.segments.lastIndex -> RouteSelectorEvaluation.Transparent
         segmentIndex > context.segments.lastIndex -> RouteSelectorEvaluation.Failed
-        context.segments[segmentIndex].isNotEmpty() -> RouteSelectorEvaluation.Constant
+        context.segments[segmentIndex].isNotEmpty() -> RouteSelectorEvaluation.Transparent
         context.hasTrailingSlash -> RouteSelectorEvaluation.ConstantPath
         else -> RouteSelectorEvaluation.Failed
     }
 
-    override fun toString(): String = "/"
+    override fun toString(): String = "<trailing slash>"
 }
 
 /**
