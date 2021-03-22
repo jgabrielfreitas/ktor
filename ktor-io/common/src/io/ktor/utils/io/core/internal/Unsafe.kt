@@ -44,7 +44,7 @@ internal fun ByteReadPacket.unsafeAppend(builder: BytePacketBuilder): Int {
 
 @DangerousInternalIoApi
 public fun Input.prepareReadFirstHead(minSize: Int): ChunkBuffer? {
-    if (this is AbstractInput) {
+    if (this is Input) {
         return prepareReadHead(minSize)
     }
 
@@ -73,7 +73,7 @@ private fun Input.prepareReadHeadFallback(minSize: Int): ChunkBuffer? {
 
 @DangerousInternalIoApi
 public fun Input.completeReadHead(current: ChunkBuffer) {
-    if (this is AbstractInput) {
+    if (this is Input) {
         if (!current.canRead()) {
             ensureNext(current)
         } else if (current.endGap < Buffer.ReservedSize) {
@@ -95,7 +95,7 @@ private fun Input.completeReadHeadFallback(current: ChunkBuffer) {
 
 @DangerousInternalIoApi
 public fun Input.prepareReadNextHead(current: ChunkBuffer): ChunkBuffer? {
-    if (this is AbstractInput) {
+    if (this is Input) {
         return ensureNextHead(current)
     }
 
@@ -117,14 +117,10 @@ private fun Input.prepareNextReadHeadFallback(current: ChunkBuffer): ChunkBuffer
 
 @DangerousInternalIoApi
 public fun Output.prepareWriteHead(capacity: Int, current: ChunkBuffer?): ChunkBuffer {
-    if (this is AbstractOutput) {
-        if (current != null) {
-            afterHeadWrite()
-        }
-        return prepareWriteHead(capacity)
+    if (current != null) {
+        afterHeadWrite()
     }
-
-    return prepareWriteHeadFallback(current)
+    return prepareWriteHead(capacity)
 }
 
 private fun Output.prepareWriteHeadFallback(current: ChunkBuffer?): ChunkBuffer {
@@ -139,11 +135,7 @@ private fun Output.prepareWriteHeadFallback(current: ChunkBuffer?): ChunkBuffer 
 
 @DangerousInternalIoApi
 public fun Output.afterHeadWrite(current: ChunkBuffer) {
-    if (this is AbstractOutput) {
-        return afterHeadWrite()
-    }
-
-    afterWriteHeadFallback(current)
+    afterHeadWrite()
 }
 
 @JvmField

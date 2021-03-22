@@ -1,5 +1,3 @@
-@file:Suppress("RedundantModalityModifier", "FunctionName")
-
 package io.ktor.utils.io.core
 
 import io.ktor.utils.io.bits.*
@@ -15,8 +13,7 @@ public class ByteReadPacket internal constructor(
     head: ChunkBuffer,
     remaining: Long,
     pool: ObjectPool<ChunkBuffer>
-) : AbstractInput(head, remaining, pool),
-    Input {
+) : Input(head, remaining, pool) {
     public constructor(head: ChunkBuffer, pool: ObjectPool<ChunkBuffer>) : this(head, head.remainingAll(), pool)
 
     init {

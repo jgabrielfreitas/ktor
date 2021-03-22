@@ -663,8 +663,8 @@ public final class io/ktor/utils/io/concurrent/SharedJvmKt {
 	public static final fun threadLocal (Ljava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
 }
 
-public abstract class io/ktor/utils/io/core/AbstractInput : io/ktor/utils/io/core/Input {
-	public static final field Companion Lio/ktor/utils/io/core/AbstractInput$Companion;
+public abstract class io/ktor/utils/io/core/Input : io/ktor/utils/io/core/Input {
+	public static final field Companion Lio/ktor/utils/io/core/Input$Companion;
 	public fun <init> ()V
 	public synthetic fun <init> (Lio/ktor/utils/io/core/IoBuffer;JLio/ktor/utils/io/pool/ObjectPool;)V
 	public synthetic fun <init> (Lio/ktor/utils/io/core/IoBuffer;JLio/ktor/utils/io/pool/ObjectPool;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
@@ -720,8 +720,8 @@ public abstract class io/ktor/utils/io/core/AbstractInput : io/ktor/utils/io/cor
 	public final synthetic fun readShort ()S
 	public final fun readText (II)Ljava/lang/String;
 	public final fun readText (Ljava/lang/Appendable;II)I
-	public static synthetic fun readText$default (Lio/ktor/utils/io/core/AbstractInput;IIILjava/lang/Object;)Ljava/lang/String;
-	public static synthetic fun readText$default (Lio/ktor/utils/io/core/AbstractInput;Ljava/lang/Appendable;IIILjava/lang/Object;)I
+	public static synthetic fun readText$default (Lio/ktor/utils/io/core/Input;IIILjava/lang/Object;)Ljava/lang/String;
+	public static synthetic fun readText$default (Lio/ktor/utils/io/core/Input;Ljava/lang/Appendable;IIILjava/lang/Object;)I
 	public final fun readTextExact (I)Ljava/lang/String;
 	public final fun readTextExact (Ljava/lang/Appendable;I)V
 	public final fun release ()V
@@ -730,19 +730,19 @@ public abstract class io/ktor/utils/io/core/AbstractInput : io/ktor/utils/io/cor
 	public final fun updateHeadRemaining (I)V
 }
 
-public final class io/ktor/utils/io/core/AbstractInput$Companion {
+public final class io/ktor/utils/io/core/Input$Companion {
 }
 
-public abstract class io/ktor/utils/io/core/AbstractOutput : io/ktor/utils/io/core/Output, java/lang/Appendable {
+public abstract class io/ktor/utils/io/core/Output : io/ktor/utils/io/core/Output, java/lang/Appendable {
 	public fun <init> ()V
 	public fun <init> (Lio/ktor/utils/io/pool/ObjectPool;)V
 	public final synthetic fun addSize (I)V
 	public final fun afterHeadWrite ()V
-	public fun append (C)Lio/ktor/utils/io/core/AbstractOutput;
+	public fun append (C)Lio/ktor/utils/io/core/Output;
 	public synthetic fun append (C)Ljava/lang/Appendable;
-	public fun append (Ljava/lang/CharSequence;)Lio/ktor/utils/io/core/AbstractOutput;
+	public fun append (Ljava/lang/CharSequence;)Lio/ktor/utils/io/core/Output;
 	public synthetic fun append (Ljava/lang/CharSequence;)Ljava/lang/Appendable;
-	public fun append (Ljava/lang/CharSequence;II)Lio/ktor/utils/io/core/AbstractOutput;
+	public fun append (Ljava/lang/CharSequence;II)Lio/ktor/utils/io/core/Output;
 	public synthetic fun append (Ljava/lang/CharSequence;II)Ljava/lang/Appendable;
 	public fun append ([CII)Ljava/lang/Appendable;
 	public final synthetic fun appendNewBuffer ()Lio/ktor/utils/io/core/IoBuffer;
@@ -996,16 +996,16 @@ public final class io/ktor/utils/io/core/BuilderKt {
 }
 
 public final class io/ktor/utils/io/core/ByteBuffersKt {
-	public static final synthetic fun afterNioBufferUsed (Lio/ktor/utils/io/core/AbstractInput;I)V
+	public static final synthetic fun afterNioBufferUsed (Lio/ktor/utils/io/core/Input;I)V
 	public static final synthetic fun afterNioBufferUsed (Lio/ktor/utils/io/core/BytePacketBuilder;I)V
 	public static final synthetic fun afterNioBufferUsed (Lio/ktor/utils/io/core/ByteReadPacket;I)V
 	public static final fun afterNioBufferUsed (Lio/ktor/utils/io/core/ByteReadPacketBase;I)V
-	public static final synthetic fun nioBuffer (Lio/ktor/utils/io/core/AbstractInput;I)Ljava/nio/ByteBuffer;
+	public static final synthetic fun nioBuffer (Lio/ktor/utils/io/core/Input;I)Ljava/nio/ByteBuffer;
 	public static final synthetic fun nioBuffer (Lio/ktor/utils/io/core/BytePacketBuilder;I)Ljava/nio/ByteBuffer;
 	public static final synthetic fun nioBuffer (Lio/ktor/utils/io/core/ByteReadPacket;I)Ljava/nio/ByteBuffer;
 	public static final synthetic fun nioBuffer (Lio/ktor/utils/io/core/ByteReadPacketBase;I)Ljava/nio/ByteBuffer;
 	public static final fun readAvailable (Lio/ktor/utils/io/core/ByteReadPacket;Ljava/nio/ByteBuffer;)I
-	public static final fun readDirect (Lio/ktor/utils/io/core/AbstractInput;ILkotlin/jvm/functions/Function1;)V
+	public static final fun readDirect (Lio/ktor/utils/io/core/Input;ILkotlin/jvm/functions/Function1;)V
 	public static final fun readDirect (Lio/ktor/utils/io/core/ByteReadPacket;ILkotlin/jvm/functions/Function1;)V
 	public static final synthetic fun readDirect (Lio/ktor/utils/io/core/ByteReadPacketBase;ILkotlin/jvm/functions/Function1;)V
 	public static final fun readFully (Lio/ktor/utils/io/core/ByteReadPacket;Ljava/nio/ByteBuffer;)I
@@ -1031,15 +1031,15 @@ public final class io/ktor/utils/io/core/ByteOrder$Companion {
 public final class io/ktor/utils/io/core/BytePacketBuilder : io/ktor/utils/io/core/BytePacketBuilderPlatformBase {
 	public fun <init> (ILio/ktor/utils/io/pool/ObjectPool;)V
 	public synthetic fun <init> (ILio/ktor/utils/io/pool/ObjectPool;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public synthetic fun append (C)Lio/ktor/utils/io/core/AbstractOutput;
+	public synthetic fun append (C)Lio/ktor/utils/io/core/Output;
 	public fun append (C)Lio/ktor/utils/io/core/BytePacketBuilder;
 	public final synthetic fun append (C)Lio/ktor/utils/io/core/BytePacketBuilderBase;
 	public synthetic fun append (C)Ljava/lang/Appendable;
-	public synthetic fun append (Ljava/lang/CharSequence;)Lio/ktor/utils/io/core/AbstractOutput;
+	public synthetic fun append (Ljava/lang/CharSequence;)Lio/ktor/utils/io/core/Output;
 	public fun append (Ljava/lang/CharSequence;)Lio/ktor/utils/io/core/BytePacketBuilder;
 	public final synthetic fun append (Ljava/lang/CharSequence;)Lio/ktor/utils/io/core/BytePacketBuilderBase;
 	public synthetic fun append (Ljava/lang/CharSequence;)Ljava/lang/Appendable;
-	public synthetic fun append (Ljava/lang/CharSequence;II)Lio/ktor/utils/io/core/AbstractOutput;
+	public synthetic fun append (Ljava/lang/CharSequence;II)Lio/ktor/utils/io/core/Output;
 	public fun append (Ljava/lang/CharSequence;II)Lio/ktor/utils/io/core/BytePacketBuilder;
 	public final synthetic fun append (Ljava/lang/CharSequence;II)Lio/ktor/utils/io/core/BytePacketBuilderBase;
 	public synthetic fun append (Ljava/lang/CharSequence;II)Ljava/lang/Appendable;
@@ -1053,7 +1053,7 @@ public final class io/ktor/utils/io/core/BytePacketBuilder : io/ktor/utils/io/co
 	public fun toString ()Ljava/lang/String;
 }
 
-public abstract class io/ktor/utils/io/core/BytePacketBuilderBase : io/ktor/utils/io/core/AbstractOutput {
+public abstract class io/ktor/utils/io/core/BytePacketBuilderBase : io/ktor/utils/io/core/Output {
 }
 
 public abstract class io/ktor/utils/io/core/BytePacketBuilderPlatformBase : io/ktor/utils/io/core/BytePacketBuilderBase {
@@ -1072,7 +1072,7 @@ public final class io/ktor/utils/io/core/ByteReadPacket$Companion {
 	public final fun getReservedSize ()I
 }
 
-public abstract class io/ktor/utils/io/core/ByteReadPacketBase : io/ktor/utils/io/core/AbstractInput {
+public abstract class io/ktor/utils/io/core/ByteReadPacketBase : io/ktor/utils/io/core/Input {
 	public static final field Companion Lio/ktor/utils/io/core/ByteReadPacketBase$Companion;
 	public synthetic fun <init> (Lio/ktor/utils/io/core/IoBuffer;JLio/ktor/utils/io/pool/ObjectPool;)V
 	public fun <init> (Lio/ktor/utils/io/core/internal/ChunkBuffer;JLio/ktor/utils/io/pool/ObjectPool;)V
@@ -1593,8 +1593,8 @@ public final class io/ktor/utils/io/core/OutputPrimitivesKt {
 }
 
 public final class io/ktor/utils/io/core/PacketDirectKt {
-	public static final fun read (Lio/ktor/utils/io/core/AbstractInput;ILkotlin/jvm/functions/Function1;)V
-	public static synthetic fun read$default (Lio/ktor/utils/io/core/AbstractInput;ILkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static final fun read (Lio/ktor/utils/io/core/Input;ILkotlin/jvm/functions/Function1;)V
+	public static synthetic fun read$default (Lio/ktor/utils/io/core/Input;ILkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
 }
 
 public final class io/ktor/utils/io/core/PacketJVMKt {

@@ -96,7 +96,7 @@ public inline fun ByteReadPacket.readDirect(size: Int, block: (ByteBuffer) -> Un
 
 @Suppress("DEPRECATION")
 @Deprecated("Use read {} instead.")
-public inline fun AbstractInput.readDirect(size: Int, block: (ByteBuffer) -> Unit) {
+public inline fun Input.readDirect(size: Int, block: (ByteBuffer) -> Unit) {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }

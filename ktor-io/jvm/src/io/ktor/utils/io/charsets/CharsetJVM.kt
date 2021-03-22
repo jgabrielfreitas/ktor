@@ -228,7 +228,7 @@ public actual fun CharsetDecoder.decode(input: Input, dst: Appendable, max: Int)
 
 public actual fun CharsetDecoder.decodeExactBytes(input: Input, inputLength: Int): String {
     if (inputLength == 0) return ""
-    if (input is AbstractInput && input.headRemaining >= inputLength) {
+    if (input is Input && input.headRemaining >= inputLength) {
         // if we have a packet or a buffered input with the first head containing enough bytes
         // then we can try fast-path
         if (input.headMemory.buffer.hasArray()) {
@@ -254,7 +254,7 @@ public actual fun CharsetDecoder.decodeExactBytes(input: Input, inputLength: Int
     return decodeImplSlow(input, inputLength)
 }
 
-private fun CharsetDecoder.decodeImplByteBuffer(input: AbstractInput, inputLength: Int): String {
+private fun CharsetDecoder.decodeImplByteBuffer(input: Input, inputLength: Int): String {
     val cb = CharBuffer.allocate(inputLength)
     val bb = input.headMemory.slice(input.head.readPosition, inputLength).buffer
 

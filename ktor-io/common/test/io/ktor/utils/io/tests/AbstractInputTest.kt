@@ -7,7 +7,7 @@ import io.ktor.utils.io.core.*
 import io.ktor.utils.io.core.internal.*
 import kotlin.test.*
 
-class AbstractInputTest {
+class InputTest {
     private val pool = VerifyingObjectPool(ChunkBuffer.Pool)
 
     @AfterTest
@@ -20,7 +20,7 @@ class AbstractInputTest {
         var closed = false
         var written = false
 
-        val input = object : AbstractInput(pool = pool) {
+        val input = object : Input(pool = pool) {
             override fun fill(destination: Memory, offset: Int, length: Int): Int {
                 if (written) return 0
                 written = true
@@ -49,7 +49,7 @@ class AbstractInputTest {
             "zxc."
         )
 
-        val input = object : AbstractInput(pool = pool) {
+        val input = object : Input(pool = pool) {
             override fun fill(): ChunkBuffer? {
                 if (items.isEmpty()) return null
                 return super.fill()

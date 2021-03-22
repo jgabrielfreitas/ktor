@@ -8,14 +8,14 @@ import io.ktor.utils.io.pool.*
 
 @DangerousInternalIoApi
 @Deprecated(
-    "Will be removed in the future releases. Use Input or AbstractInput instead.",
-    ReplaceWith("AbstractInput", "io.ktor.utils.io.core.AbstractInput")
+    "Will be removed in the future releases. Use Input or Input instead.",
+    ReplaceWith("Input", "io.ktor.utils.io.core.Input")
 )
 public abstract class ByteReadPacketBase(
     head: ChunkBuffer,
     remaining: Long,
     pool: ObjectPool<ChunkBuffer>
-) : AbstractInput(head, remaining, pool)
+) : Input(head, remaining, pool)
 
 public expect class EOFException(message: String) : IOException
 

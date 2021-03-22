@@ -5,11 +5,11 @@ import io.ktor.utils.io.core.internal.*
 /**
  * Copy all bytes to the [output].
  * Depending on actual input and output implementation it could be zero-copy or copy byte per byte.
- * All regular types such as [ByteReadPacket], [BytePacketBuilder], [AbstractInput] and [AbstractOutput]
+ * All regular types such as [ByteReadPacket], [BytePacketBuilder], [Input] and [Output]
  * are always optimized so no bytes will be copied.
  */
 public fun Input.copyTo(output: Output): Long {
-    if (this !is AbstractInput || output !is AbstractOutput) {
+    if (this !is Input) {
         // slow-path
         return copyToFallback(output)
     }
