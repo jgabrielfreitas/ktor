@@ -75,7 +75,6 @@ public abstract class AbstractInput(
     internal final var headPosition: Int
         get() = state.headPosition
         set(value) {
-            println("Set headPosition: $value. $headRemaining")
             state.headPosition = value
         }
 
