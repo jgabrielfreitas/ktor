@@ -101,11 +101,13 @@ internal object EmptyBufferPoolImpl : NoPoolImpl<IoBuffer>() {
     override fun borrow() = IoBuffer.Empty
 }
 
-internal tailrec fun ChunkBuffer?.releaseAll(pool: ObjectPool<ChunkBuffer>) {
-    if (this == null) return
-    val next = cleanNext()
-    release(pool)
-    next.releaseAll(pool)
+internal fun ChunkBuffer?.releaseAll(pool: ObjectPool<ChunkBuffer>) {
+    var current = this
+    while (current != null) {
+        val next = current.cleanNext()
+        current.release(pool)
+        current = next
+    }
 }
 
 internal inline fun ChunkBuffer.forEachChunk(block: (ChunkBuffer) -> Unit) {

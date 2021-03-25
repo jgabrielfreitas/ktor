@@ -408,9 +408,9 @@ class BytePacketReaderWriterTest {
         try {
             block(builder)
             return builder.build()
-        } catch (t: Throwable) {
+        } catch (cause: Throwable) {
             builder.release()
-            throw t
+            throw cause
         }
     }
 
