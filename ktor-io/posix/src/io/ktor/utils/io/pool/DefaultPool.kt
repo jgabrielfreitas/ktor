@@ -2,9 +2,13 @@ package io.ktor.utils.io.pool
 
 import io.ktor.utils.io.concurrent.*
 import kotlinx.atomicfu.*
+import kotlinx.atomicfu.locks.*
 
-public actual abstract class DefaultPool<T : Any>
-actual constructor(actual final override val capacity: Int) : ObjectPool<T> {
+public actual abstract class DefaultPool<T : Any> actual constructor(
+    actual final override val capacity: Int
+) : ObjectPool<T> {
+    protected val lock: SynchronizedObject = SynchronizedObject()
+
     private val instances = atomicArrayOfNulls<Any?>(capacity)
     private var size by shared(0)
 
@@ -14,7 +18,7 @@ actual constructor(actual final override val capacity: Int) : ObjectPool<T> {
     protected actual open fun clearInstance(instance: T): T = instance
     protected actual open fun validateInstance(instance: T) {}
 
-    public actual final override fun borrow(): T {
+    public actual final override fun borrow(): T = synchronized(lock) {
         if (size == 0) return produceInstance()
         val idx = --size
 
@@ -26,21 +30,25 @@ actual constructor(actual final override val capacity: Int) : ObjectPool<T> {
     }
 
     public actual final override fun recycle(instance: T) {
-        validateInstance(instance)
-        if (size == capacity) {
-            disposeInstance(instance)
-        } else {
-            instances[size++].value = instance
+        synchronized(lock) {
+            validateInstance(instance)
+            if (size == capacity) {
+                disposeInstance(instance)
+            } else {
+                instances[size++].value = instance
+            }
         }
     }
 
     public actual final override fun dispose() {
-        for (i in 0 until size) {
-            @Suppress("UNCHECKED_CAST")
-            val instance = instances[i].value as T
-            instances[i].value = null
-            disposeInstance(instance)
+        synchronized(lock) {
+            for (i in 0 until size) {
+                @Suppress("UNCHECKED_CAST")
+                val instance = instances[i].value as T
+                instances[i].value = null
+                disposeInstance(instance)
+            }
+            size = 0
         }
-        size = 0
     }
 }

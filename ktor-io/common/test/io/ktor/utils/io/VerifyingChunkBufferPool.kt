@@ -18,9 +18,9 @@ class VerifyingChunkBufferPool(
     private val allocated = SharedSet<IdentityWrapper>()
 
     override fun borrow(): ChunkBuffer {
-        val result = ChunkBuffer(allocator.alloc(bufferSize), null, this)
-        check(allocated.add(IdentityWrapper(result)))
-        return result
+        val instance = ChunkBuffer(allocator.alloc(bufferSize), null, this)
+        check(allocated.add(IdentityWrapper(instance)))
+        return instance
     }
 
     override fun recycle(instance: ChunkBuffer) {
