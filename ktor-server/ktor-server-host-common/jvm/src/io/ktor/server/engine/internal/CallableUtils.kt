@@ -82,7 +82,9 @@ private fun ApplicationEnvironment.createModuleContainer(
 }
 
 private fun <R> ApplicationEnvironment.callFunctionWithInjection(
-    instance: Any?, entryPoint: KFunction<R>, application: Application
+    instance: Any?,
+    entryPoint: KFunction<R>,
+    application: Application
 ): R = entryPoint.callBy(
     entryPoint.parameters.filterNot { it.isOptional }.associateBy(
         { it },

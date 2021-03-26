@@ -14,7 +14,6 @@ import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import org.slf4j.*
 import java.io.*
-import java.lang.reflect.*
 import java.net.*
 import java.nio.file.*
 import java.nio.file.StandardWatchEventKinds.*
@@ -22,9 +21,6 @@ import java.nio.file.attribute.*
 import java.util.concurrent.locks.*
 import kotlin.concurrent.*
 import kotlin.coroutines.*
-import kotlin.reflect.*
-import kotlin.reflect.full.*
-import kotlin.reflect.jvm.*
 
 /**
  * Implements [ApplicationEngineEnvironment] by loading an [Application] from a folder or jar.
@@ -302,13 +298,13 @@ public class ApplicationEngineEnvironmentReloading(
             }
 
             modules.forEach { module ->
-               val name = module.methodName()
+                val name = module.methodName()
 
-               try {
-                   launchModuleByName(name, currentClassLoader, newInstance)
-               } catch (_: Throwable) {
-                   module(newInstance)
-               }
+                try {
+                    launchModuleByName(name, currentClassLoader, newInstance)
+                } catch (_: Throwable) {
+                    module(newInstance)
+                }
             }
         }
 
