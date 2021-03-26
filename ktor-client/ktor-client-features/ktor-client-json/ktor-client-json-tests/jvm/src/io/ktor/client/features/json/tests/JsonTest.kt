@@ -43,13 +43,13 @@ public abstract class JsonTest : TestWithKtor() {
             gson(customContentType)
         }
         routing {
-            createRoutes()
+            createRoutes(this)
         }
     }
 
     private val customContentType = ContentType.parse("application/x-json")
 
-    protected open fun Routing.createRoutes() {
+    protected open fun createRoutes(routing: Routing): Unit = with(routing) {
         post("/widget") {
             val received = call.receive<Widget>()
             assertEquals(widget, received)

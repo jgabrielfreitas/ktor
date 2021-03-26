@@ -19,8 +19,8 @@ import kotlin.test.*
 class JacksonTest : JsonTest() {
     override val serializerImpl = JacksonSerializer()
 
-    override fun Routing.createRoutes() {
-        super.createRoutes()
+    override fun createRoutes(routing: Routing): Unit = with(routing) {
+        super.createRoutes(routing)
 
         post("/jackson") {
             assertEquals(Jackson("request", null), call.receive())
