@@ -22,21 +22,28 @@ internal fun startServer(): Closeable {
     val logger = LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME) as ch.qos.logback.classic.Logger
     logger.level = Level.WARN
 
-    val tcpServer = TestTcpServer(HTTP_PROXY_PORT, ::tcpServerHandler)
+    val scope = CloseableScope()
+    try {
+        val tcpServer = TestTcpServer(HTTP_PROXY_PORT, ::tcpServerHandler)
+        scope.use(tcpServer)
 
-    val server = embeddedServer(CIO, DEFAULT_PORT) {
-        tests()
-    }.start()
+        val server = embeddedServer(CIO, DEFAULT_PORT) {
+            tests()
+        }.start()
 
-    val tlsServer = setupTLSServer()
-    tlsServer.start()
+        scope.use(Closeable { server.stop(0L, 0L, TimeUnit.MILLISECONDS) })
 
-    Thread.sleep(1000)
+        val tlsServer = setupTLSServer()
+        tlsServer.start()
+        scope.use(Closeable { tlsServer.stop(0L, 0L, TimeUnit.MILLISECONDS) })
+
+        Thread.sleep(1000)
+    } catch (cause: Throwable) {
+        scope.close()
+    }
 
     return Closeable {
-        tcpServer.close()
-        server.stop(0L, 0L, TimeUnit.MILLISECONDS)
-        tlsServer.stop(0L, 0L, TimeUnit.MILLISECONDS)
+        scope.close()
     }
 }
 
@@ -54,7 +61,7 @@ public fun main() {
 }
 
 private fun setupTLSServer(): ApplicationEngine {
-    val file = File("build/client-tls-test-server.jks")
+    val file = File.createTempFile("server", "certificate")
     val testKeyStore = generateCertificate(file)
     val tlsServer = embeddedServer(
         Jetty,
